@@ -1,0 +1,3063 @@
+{
+  "file name" : "2503.08102.pdf",
+  "number of pages" : 14,
+  "author" : "",
+  "title" : "",
+  "creation date" : "D:20250313005030Z",
+  "modification date" : "D:20250313005030Z",
+  "kids" : [ {
+    "type" : "heading",
+    "id" : 284,
+    "level" : "Doctitle",
+    "page number" : 1,
+    "bounding box" : [ 178.409, 675.355, 432.973, 690.832 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 17.215,
+    "text color" : "[0.0]",
+    "content" : "AI-native Memory 2.0: Second Me"
+  }, {
+    "type" : "paragraph",
+    "id" : 285,
+    "page number" : 1,
+    "bounding box" : [ 142.16, 621.111, 472.331, 631.571 ],
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Jiale Wei Xiang Ying ∗ Tao Gao Fangyi Bao Felix Tao Jingbo Shang"
+  }, {
+    "type" : "paragraph",
+    "id" : 286,
+    "page number" : 1,
+    "bounding box" : [ 242.608, 599.309, 369.392, 607.861 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "{yingxiang, tao}@mindverse.ai"
+  }, {
+    "type" : "paragraph",
+    "id" : 287,
+    "page number" : 1,
+    "bounding box" : [ 279.928, 577.49, 332.072, 586.042 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Mindverse.ai"
+  }, {
+    "type" : "heading",
+    "id" : 288,
+    "level" : "Subtitle",
+    "page number" : 1,
+    "bounding box" : [ 283.758, 535.876, 328.243, 546.624 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "Abstract"
+  }, {
+    "type" : "paragraph",
+    "id" : 289,
+    "page number" : 1,
+    "bounding box" : [ 143.866, 271.975, 469.874, 520.673 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Human interaction with the external world fundamentally involves the exchange of personal memory, whether with other individuals, websites, applications, or, in the future, AI agents. A significant portion of this interaction is redundant, requiring users to repeatedly provide the same information across different contexts. Existing solutions, such as browser-stored credentials, autofill mechanisms, and unified authentication systems, have aimed to mitigate this redundancy by serving as intermediaries that store and retrieve commonly used user data. The advent of large language models (LLMs) presents an opportunity to redefine memory management through an AI-native paradigm: S ECOND M E . S ECOND M E acts as an intelligent, persistent memory offload system that retains, organizes, and dynamically utilizes user-specific knowledge. By serving as an intermediary in user interactions, it can autonomously generate context-aware responses, prefill required information, and facilitate seamless communication with external systems, significantly reducing cognitive load and interaction friction. Unlike traditional memory storage solutions, S ECOND M E extends beyond static data retention by leveraging LLM-based memory parameterization. This enables structured organization, contextual reasoning, and adaptive knowledge retrieval, facilitating a more systematic and intelligent approach to memory management. As AI-driven personal agents like S ECOND M E become increasingly integrated into digital ecosystems, S ECOND M E further represents a critical step toward augmenting human-world interaction with persistent, contextually aware, and self-optimizing memory systems. We have open-sourced the fully localizable deployment system at GitHub: https://github.com/Mindverse/Second-Me ."
+  }, {
+    "type" : "heading",
+    "id" : 290,
+    "level" : "Subtitle",
+    "page number" : 1,
+    "bounding box" : [ 108.0, 236.873, 190.814, 247.621 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "1 Introduction"
+  }, {
+    "type" : "paragraph",
+    "id" : 291,
+    "page number" : 1,
+    "bounding box" : [ 108.0, 148.219, 505.247, 222.226 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Human interaction with the external world relies heavily on memory, whether recalling information in conversations or repeatedly providing personal data across digital platforms. This redundancy leads to cognitive fatigue and disrupts seamless engagement with technology. Existing solutions, such as autofill mechanisms and unified authentication systems, help alleviate some of this burden by storing and retrieving commonly used data. However, they function as static repositories without contextual reasoning or adaptability, requiring users to manually manage and verify their information, resulting in a fragmented and suboptimal experience."
+  }, {
+    "type" : "paragraph",
+    "id" : 292,
+    "page number" : 1,
+    "bounding box" : [ 107.691, 99.103, 505.654, 140.383 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The rise of large language models (LLMs) offers a transformative opportunity to redefine memory management through an AI-native approach. As shown in Figure 1, we introduce S ECOND M E , an intelligent, persistent memory offload system that serves as a dynamic intermediary in humanmachine interactions. Unlike traditional storage solutions, S ECOND M E is an adaptive, context-aware"
+  }, {
+    "type" : "paragraph",
+    "id" : 293,
+    "page number" : 1,
+    "bounding box" : [ 119.822, 80.024, 169.706, 89.776 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "∗ Project Lead"
+  }, {
+    "type" : "image",
+    "page number" : 2,
+    "bounding box" : [ 147.599, 547.043, 464.383, 720.011 ],
+    "source" : "2503.08102_images/imageFile1.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 295,
+    "page number" : 2,
+    "bounding box" : [ 298.333, 712.333, 324.333, 717.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Response"
+  }, {
+    "type" : "paragraph",
+    "id" : 296,
+    "page number" : 2,
+    "bounding box" : [ 207.0, 677.0, 239.0, 683.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Second Me"
+  }, {
+    "type" : "paragraph",
+    "id" : 297,
+    "page number" : 2,
+    "bounding box" : [ 162.0, 661.0, 181.667, 667.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Memory"
+  }, {
+    "type" : "paragraph",
+    "id" : 298,
+    "page number" : 2,
+    "bounding box" : [ 183.667, 662.333, 207.667, 667.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "~retrieves"
+  }, {
+    "type" : "paragraph",
+    "id" : 300,
+    "page number" : 2,
+    "bounding box" : [ 336.0, 658.0, 371.333, 666.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Agent Model"
+  }, {
+    "type" : "paragraph",
+    "id" : 301,
+    "page number" : 2,
+    "bounding box" : [ 427.0, 659.667, 443.667, 665.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Tools"
+  }, {
+    "type" : "paragraph",
+    "id" : 299,
+    "page number" : 2,
+    "bounding box" : [ 301.667, 659.667, 313.0, 663.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "voke"
+  }, {
+    "type" : "paragraph",
+    "id" : 303,
+    "page number" : 2,
+    "bounding box" : [ 254.0, 640.667, 283.333, 648.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "L2 Memory"
+  }, {
+    "type" : "paragraph",
+    "id" : 302,
+    "page number" : 2,
+    "bounding box" : [ 210.333, 641.0, 233.0, 647.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Context"
+  }, {
+    "type" : "paragraph",
+    "id" : 305,
+    "page number" : 2,
+    "bounding box" : [ 421.0, 623.0, 450.667, 632.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Knowledge"
+  }, {
+    "type" : "paragraph",
+    "id" : 304,
+    "page number" : 2,
+    "bounding box" : [ 339.0, 622.667, 369.333, 631.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Reasoning"
+  }, {
+    "type" : "paragraph",
+    "id" : 306,
+    "page number" : 2,
+    "bounding box" : [ 345.667, 617.667, 362.333, 623.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Model"
+  }, {
+    "type" : "paragraph",
+    "id" : 307,
+    "page number" : 2,
+    "bounding box" : [ 428.333, 618.333, 444.333, 623.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Bases"
+  }, {
+    "type" : "paragraph",
+    "id" : 309,
+    "page number" : 2,
+    "bounding box" : [ 221.148, 605.056, 231.185, 610.611 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Loop"
+  }, {
+    "type" : "paragraph",
+    "id" : 308,
+    "page number" : 2,
+    "bounding box" : [ 207.0, 605.667, 220.333, 610.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Inner"
+  }, {
+    "type" : "paragraph",
+    "id" : 311,
+    "page number" : 2,
+    "bounding box" : [ 225.667, 587.667, 255.667, 592.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Personalized"
+  }, {
+    "type" : "paragraph",
+    "id" : 310,
+    "page number" : 2,
+    "bounding box" : [ 210.333, 585.0, 223.667, 589.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Query"
+  }, {
+    "type" : "paragraph",
+    "id" : 315,
+    "page number" : 2,
+    "bounding box" : [ 422.333, 583.0, 448.333, 589.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Internet"
+  }, {
+    "type" : "paragraph",
+    "id" : 313,
+    "page number" : 2,
+    "bounding box" : [ 335.0, 583.667, 351.667, 589.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Human"
+  }, {
+    "type" : "paragraph",
+    "id" : 314,
+    "page number" : 2,
+    "bounding box" : [ 353.667, 583.0, 375.667, 589.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Experts"
+  }, {
+    "type" : "paragraph",
+    "id" : 312,
+    "page number" : 2,
+    "bounding box" : [ 231.0, 582.333, 251.0, 587.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Response"
+  }, {
+    "type" : "paragraph",
+    "id" : 316,
+    "page number" : 2,
+    "bounding box" : [ 195.667, 560.333, 245.0, 567.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Device/PC/Mobile"
+  }, {
+    "type" : "paragraph",
+    "id" : 317,
+    "page number" : 2,
+    "bounding box" : [ 247.0, 560.333, 263.0, 566.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Phone"
+  }, {
+    "type" : "paragraph",
+    "id" : 318,
+    "page number" : 2,
+    "bounding box" : [ 150.333, 547.667, 167.0, 551.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "User Side"
+  }, {
+    "type" : "paragraph",
+    "id" : 319,
+    "page number" : 2,
+    "bounding box" : [ 212.86, 530.367, 398.899, 538.919 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Figure 1: Hybrid Architecture of S ECOND M E"
+  }, {
+    "type" : "paragraph",
+    "id" : 320,
+    "page number" : 2,
+    "bounding box" : [ 108.0, 462.78, 504.0, 504.059 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "assistant that autonomously retrieves, organizes, and applies user-specific knowledge. Leveraging LLM-based memory parameterization as envisioned in Shang et al. (2024), S ECOND M E enhances structured knowledge organization, contextual reasoning, and adaptive retrieval for seamless digital interactions."
+  }, {
+    "type" : "paragraph",
+    "id" : 321,
+    "page number" : 2,
+    "bounding box" : [ 107.532, 337.301, 505.742, 454.943 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In this work, we explore diverse data sources and training styles, integrating supervised fine-tuning (SFT) and direct preference optimization (DPO) (Rafailov et al., 2024) to enhance LLM performance. We introduce three key tasks with automated LLM evaluation to assess the model’s effectiveness in personal AI applications: (1) memory-based multi-perspective Q&A, (2) context completion based on user needs, and (3) context critique incorporating user preferences and external responses. To support these tasks, we design an LLM-driven automated data synthesis strategy that integrates local and global data perspectives, a multi-agent framework, and Chain-of-Thought (CoT) (Wei et al., 2023) style synthesis. Our experiments show that using diverse data sources with strong CoT-style normalization yields the best S ECOND M E performance in automated evaluations. Additionally, human case studies suggest that S ECOND M E ’s true effectiveness may surpass reported metrics, as LLM-based evaluations tend to underestimate its quality."
+  }, {
+    "type" : "paragraph",
+    "id" : 322,
+    "page number" : 2,
+    "bounding box" : [ 107.477, 277.13, 506.616, 329.464 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "To the best of our knowledge, we propose the first fully automated post-training pipeline based on personal document records, using the trained personal model as the core of a multi-layer hybrid system. This S ECOND M E system would serve as a new paradigm for future personalized LLM applications. We have open-sourced the fully localizable deployment system at GitHub: https: //github.com/Mindverse/Second-Me ."
+  }, {
+    "type" : "paragraph",
+    "id" : 323,
+    "page number" : 2,
+    "bounding box" : [ 108.0, 217.251, 504.351, 269.439 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Given S ECOND M E ’s strong performance, we anticipate a vast range of applications in the near future. As an extension of human memory, S ECOND M E reduces cognitive effort by preemptively providing relevant information, auto-completing forms, recalling past interactions, and maintaining context across applications. Beyond mere storage, it functions as a self-optimizing AI agent that learns, adapts, and refines its understanding of user preferences and behaviors."
+  }, {
+    "type" : "paragraph",
+    "id" : 324,
+    "page number" : 2,
+    "bounding box" : [ 107.641, 146.317, 505.245, 209.414 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "As AI-driven personal memory agents like S ECOND M E integrate into digital ecosystems, they usher in a new era of human-AI collaboration. By enhancing memory retention and retrieval in a contextually aware manner, S ECOND M E streamlines digital interactions, reduces friction, and improves efficiency, enabling a more seamless and intelligent exchange of knowledge. Furthermore, S ECOND M E has the potential to facilitate networked intelligence , where multiple agents collaborate, share relevant insights, and coordinate tasks across different applications and users."
+  }, {
+    "type" : "heading",
+    "id" : 325,
+    "level" : "Subtitle",
+    "page number" : 2,
+    "bounding box" : [ 108.0, 115.579, 275.318, 126.327 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "2 An Overview of S ECOND M E"
+  }, {
+    "type" : "paragraph",
+    "id" : 326,
+    "page number" : 2,
+    "bounding box" : [ 107.532, 69.934, 505.245, 100.304 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "We envision SECOND ME as a Context Provider. It acts as a bridge between users, future AI agents, and the broader information world, facilitating seamless interaction. It is an evolved version of the Large Personal Model (LPM) (Shang et al., 2024), which was proposed by us last year, a three-layer system centered around personalized memory management. From a technical perspective, SECOND ME has further refined the Hybrid framework design and validated the iteration of personalized models, ensuring the system's efficiency and adaptability in addressing complex demands. SECOND ME not only represents the cutting edge of our current technology but also embodies our product philosophy at this stage - reflecting our commitment to personalized and intelligent interactions."
+  }, {
+    "type" : "heading",
+    "id" : 327,
+    "level" : "Subtitle",
+    "page number" : 3,
+    "bounding box" : [ 108.0, 627.669, 313.608, 636.625 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "2.1 Large Personal Model (LPM) 1.0: A Recap"
+  }, {
+    "type" : "paragraph",
+    "id" : 328,
+    "page number" : 3,
+    "bounding box" : [ 107.641, 559.197, 503.998, 611.385 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "As we argued in Shang et al. (2024), AI-native memory is a must-have component towards Artificial General Intelligence (AGI). Through experiments, we showed that LLMs with ultra long context capabilities fall short, both in terms of performance and cost, especially in searching, organizing, and reasoning with complex user memory. We proposed that a memory system shall have data across three layers:"
+  }, {
+    "type" : "list",
+    "level" : "1",
+    "page number" : 3,
+    "bounding box" : [ 108.0, 465.712, 505.246, 554.438 ],
+    "numbering style" : "unordered",
+    "number of list items" : 3,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 3,
+      "bounding box" : [ 108.0, 531.166, 503.995, 554.438 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• L0: Raw Data Layer. This layer is akin to applying RALM (Ram et al., 2023) or RAG (Lewis et al., 2020) directly to raw data, defining memory as the entirety of unstructured data.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 3,
+      "bounding box" : [ 108.0, 498.439, 504.003, 532.62 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• L1: Natural Language Memory Layer. This layer encompasses memories that can be summarized in natural language forms, such as a user’s brief bio, a list of significant sentences or phrases, and preference tags.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 3,
+      "bounding box" : [ 108.0, 465.712, 505.246, 499.893 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• L2: AI-Native Memory Layer. This layer represents memories that do not necessarily require natural language descriptions. Instead, they are learned and organized through model parameters, with each LPM being a neural network.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 332,
+    "page number" : 3,
+    "bounding box" : [ 108.0, 406.42, 504.004, 458.608 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "For the L2 layer, we explored the challenges and potential solutions, focusing on issues such as training efficiency, serving efficiency, cold start, and catastrophic forgetting. We conducted initial experiments with L2, defining the tasks and evaluation metrics that AI Native Memory models must address. Collaborating with early adopters, we trained and tested the model, ultimately validating that its performance surpassed that of RAG and long-context models."
+  }, {
+    "type" : "paragraph",
+    "id" : 333,
+    "page number" : 3,
+    "bounding box" : [ 107.641, 346.395, 504.167, 398.583 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "As the AI landscape continues to evolve rapidly, we can now articulate our vision with greater precision: in the era of AGI (Bubeck et al., 2023), powered by general-purpose LLMs, the key to enabling humans to fully integrate into this system and reap its benefits lies in an AI system that stands on the user’s side—one that considers each individual, possesses their memory, and has absorbed it meaningfully. This is the path to a truly user-centric AGI."
+  }, {
+    "type" : "heading",
+    "id" : 334,
+    "level" : "Doctitle",
+    "page number" : 3,
+    "bounding box" : [ 108.0, 309.729, 255.575, 318.685 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "2.2 S ECOND M E : Overall Design"
+  }, {
+    "type" : "paragraph",
+    "id" : 335,
+    "page number" : 3,
+    "bounding box" : [ 108.0, 230.347, 504.251, 293.445 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "S ECOND M E introduces a novel approach to memory management by leveraging LLM-based parameterization, enabling structured data organization, contextual reasoning, and adaptive knowledge retrieval. With the rise of reasoning models like Deepseek R1 (DeepSeek-AI et al., 2025) and advancements in general-purpose LLM agents, we position S ECOND M E as a context provider aligned with the user’s perspective, rather than a task executor. This principle guides the task scenarios outlined in Section 3."
+  }, {
+    "type" : "paragraph",
+    "id" : 336,
+    "page number" : 3,
+    "bounding box" : [ 107.691, 181.232, 505.249, 222.511 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "To realize this vision, we designed a Hybrid architecture (Figure 1), preserving the L0, L1, and L2 layers from LPM 1.0 while introducing an inner loop for seamless layer integration. Additionally, an outer loop structure enables LLMs and internet resources to function under S ECOND M E ’s guidance, ensuring precise, context-aware responses tailored to user needs."
+  }, {
+    "type" : "paragraph",
+    "id" : 337,
+    "page number" : 3,
+    "bounding box" : [ 108.0, 153.934, 503.769, 173.783 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Upgrades in S ECOND M E from LPM 1.0 . While maintaining the three-layer architecture, S ECOND M E introduces key upgrades:"
+  }, {
+    "type" : "list",
+    "level" : "1",
+    "page number" : 3,
+    "bounding box" : [ 108.0, 71.358, 504.0, 149.175 ],
+    "numbering style" : "unordered",
+    "number of list items" : 3,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 3,
+      "bounding box" : [ 108.0, 125.903, 503.754, 149.175 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Enhanced Layer Integration : Unlike LPM 1.0, where layers operated independently, S ECOND M E redesigns L0 and L1 to provide richer contextual support for L2.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 3,
+      "bounding box" : [ 108.0, 104.085, 504.0, 127.357 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Redefined L2 Role : L2 now functions as an orchestrator, leveraging external expert models to handle complex user needs, shifting from task execution to intelligent coordination.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 3,
+      "bounding box" : [ 108.0, 71.358, 504.0, 105.539 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Automated Training Pipeline : S ECOND M E establishes a fully automated pipeline, including data synthesis (Wang et al., 2023; Zheng et al., 2023), filtering, SFT, Direct Preference Optimization (DPO), and evaluation (Zhang et al., 2024), achieving state-of-the-art L2 performance.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "image",
+    "page number" : 4,
+    "bounding box" : [ 147.599, 529.959, 464.408, 720.006 ],
+    "source" : "2503.08102_images/imageFile2.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 342,
+    "page number" : 4,
+    "bounding box" : [ 169.0, 704.333, 179.0, 709.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "LLM"
+  }, {
+    "type" : "paragraph",
+    "id" : 343,
+    "page number" : 4,
+    "bounding box" : [ 412.333, 705.0, 429.667, 709.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Global"
+  }, {
+    "type" : "paragraph",
+    "id" : 346,
+    "page number" : 4,
+    "bounding box" : [ 362.333, 700.333, 379.667, 706.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Topics"
+  }, {
+    "type" : "paragraph",
+    "id" : 345,
+    "page number" : 4,
+    "bounding box" : [ 311.667, 700.333, 334.333, 705.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Entities"
+  }, {
+    "type" : "paragraph",
+    "id" : 347,
+    "page number" : 4,
+    "bounding box" : [ 407.667, 698.333, 433.667, 704.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Biography"
+  }, {
+    "type" : "paragraph",
+    "id" : 344,
+    "page number" : 4,
+    "bounding box" : [ 173.667, 698.333, 188.333, 703.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Judge"
+  }, {
+    "type" : "paragraph",
+    "id" : 348,
+    "page number" : 4,
+    "bounding box" : [ 211.667, 663.667, 247.667, 669.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Data cleaning"
+  }, {
+    "type" : "paragraph",
+    "id" : 350,
+    "page number" : 4,
+    "bounding box" : [ 324.0, 660.333, 341.667, 667.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Mining"
+  }, {
+    "type" : "paragraph",
+    "id" : 349,
+    "page number" : 4,
+    "bounding box" : [ 311.0, 661.0, 322.333, 665.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Data"
+  }, {
+    "type" : "paragraph",
+    "id" : 354,
+    "page number" : 4,
+    "bounding box" : [ 355.667, 659.667, 397.667, 665.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Semi-Structured"
+  }, {
+    "type" : "paragraph",
+    "id" : 351,
+    "page number" : 4,
+    "bounding box" : [ 164.333, 656.333, 201.0, 661.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "User Raw Data"
+  }, {
+    "type" : "paragraph",
+    "id" : 353,
+    "page number" : 4,
+    "bounding box" : [ 262.333, 656.333, 295.667, 661.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Cleaned Data"
+  }, {
+    "type" : "paragraph",
+    "id" : 352,
+    "page number" : 4,
+    "bounding box" : [ 211.333, 652.333, 247.667, 659.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "preprocessing"
+  }, {
+    "type" : "paragraph",
+    "id" : 355,
+    "page number" : 4,
+    "bounding box" : [ 371.0, 654.333, 382.333, 659.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Data"
+  }, {
+    "type" : "paragraph",
+    "id" : 356,
+    "page number" : 4,
+    "bounding box" : [ 398.0, 629.333, 445.667, 642.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "deepseek"
+  }, {
+    "type" : "paragraph",
+    "id" : 357,
+    "page number" : 4,
+    "bounding box" : [ 424.333, 616.333, 452.333, 623.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Related QA"
+  }, {
+    "type" : "paragraph",
+    "id" : 359,
+    "page number" : 4,
+    "bounding box" : [ 311.0, 606.333, 349.667, 612.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Data Filtering"
+  }, {
+    "type" : "paragraph",
+    "id" : 358,
+    "page number" : 4,
+    "bounding box" : [ 225.0, 606.333, 237.0, 611.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "PEFT"
+  }, {
+    "type" : "paragraph",
+    "id" : 362,
+    "page number" : 4,
+    "bounding box" : [ 357.0, 602.333, 396.333, 608.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Synthetic Data"
+  }, {
+    "type" : "paragraph",
+    "id" : 361,
+    "page number" : 4,
+    "bounding box" : [ 262.333, 601.667, 298.333, 607.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Filtered Data"
+  }, {
+    "type" : "paragraph",
+    "id" : 360,
+    "page number" : 4,
+    "bounding box" : [ 171.0, 600.333, 196.333, 605.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "SFT Model"
+  }, {
+    "type" : "paragraph",
+    "id" : 363,
+    "page number" : 4,
+    "bounding box" : [ 427.667, 585.667, 447.667, 591.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Context"
+  }, {
+    "type" : "paragraph",
+    "id" : 364,
+    "page number" : 4,
+    "bounding box" : [ 423.667, 579.667, 451.667, 585.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Related QA"
+  }, {
+    "type" : "paragraph",
+    "id" : 365,
+    "page number" : 4,
+    "bounding box" : [ 155.333, 573.667, 177.667, 580.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Sampling"
+  }, {
+    "type" : "paragraph",
+    "id" : 366,
+    "page number" : 4,
+    "bounding box" : [ 184.333, 573.667, 208.333, 579.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Comparing"
+  }, {
+    "type" : "paragraph",
+    "id" : 369,
+    "page number" : 4,
+    "bounding box" : [ 313.0, 548.333, 341.0, 554.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Evaluating"
+  }, {
+    "type" : "paragraph",
+    "id" : 368,
+    "page number" : 4,
+    "bounding box" : [ 226.333, 547.667, 235.0, 552.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "DPO"
+  }, {
+    "type" : "paragraph",
+    "id" : 367,
+    "page number" : 4,
+    "bounding box" : [ 161.0, 545.667, 207.667, 551.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Paired Preference"
+  }, {
+    "type" : "paragraph",
+    "id" : 372,
+    "page number" : 4,
+    "bounding box" : [ 366.333, 544.333, 386.333, 549.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Service"
+  }, {
+    "type" : "paragraph",
+    "id" : 371,
+    "page number" : 4,
+    "bounding box" : [ 267.0, 542.333, 292.333, 547.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "DPO Model"
+  }, {
+    "type" : "paragraph",
+    "id" : 370,
+    "page number" : 4,
+    "bounding box" : [ 178.333, 539.667, 190.333, 545.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Data"
+  }, {
+    "type" : "paragraph",
+    "id" : 373,
+    "page number" : 4,
+    "bounding box" : [ 111.87, 513.283, 500.132, 521.835 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Figure 2: Automated Personal Model pipeline with LLM as a Judge and LLM as data synthesizer"
+  }, {
+    "type" : "heading",
+    "id" : 374,
+    "level" : "Doctitle",
+    "page number" : 4,
+    "bounding box" : [ 108.0, 480.461, 299.808, 491.209 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "3 S ECOND M E : Practice and Result"
+  }, {
+    "type" : "paragraph",
+    "id" : 375,
+    "page number" : 4,
+    "bounding box" : [ 108.0, 403.409, 505.249, 466.506 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Our LPM 1.0 empirically showed for the first time that LLMs can compress and parameterize various types of memories, so users can later retrieve and utilize them through conversation. In this work, we upgrade this idea to S ECOND M E , which involves a more comprehensive system design spanning L0, L1, and L2. Specifically, we explore diverse data sources and styles for training data synthesis and filtering, SFT and DPO to enhance the LLM. In this section, we will first introduce the new training framework of S ECOND M E and then present the evaluation results."
+  }, {
+    "type" : "heading",
+    "id" : 376,
+    "level" : "Subtitle",
+    "page number" : 4,
+    "bounding box" : [ 108.0, 379.108, 221.354, 388.064 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.1 Overview of Training"
+  }, {
+    "type" : "paragraph",
+    "id" : 377,
+    "page number" : 4,
+    "bounding box" : [ 107.671, 304.604, 505.747, 368.089 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Training Objectives . Within the hybrid framework, the L2 model adapts based on task complexity. It directly assists users with simpler tasks and collaborates with a general-purpose LLM for more complex problems requiring advanced reasoning, external data, or tools all while maintaining user context. Additionally, since users may perceive the model as an extension of themselves in external interactions, L2 must distinguish between two key roles: directly assisting the user or representing them in external engagements. In both cases, its core objective remains serving the user’s needs."
+  }, {
+    "type" : "paragraph",
+    "id" : 378,
+    "page number" : 4,
+    "bounding box" : [ 107.532, 288.215, 371.979, 296.767 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We identify three primary deployment scenarios for the L2 model:"
+  }, {
+    "type" : "list",
+    "level" : "1",
+    "page number" : 4,
+    "bounding box" : [ 108.0, 205.639, 505.743, 283.457 ],
+    "numbering style" : "unordered",
+    "number of list items" : 3,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 4,
+      "bounding box" : [ 108.0, 248.678, 505.743, 283.457 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Memory QA : This includes traditional tasks such as knowledge retrieval, concept understanding, behavior prediction, and item recommendation. Depending on the context, L2 may either serve the user directly ( Memory (Self) ) or represent them in external interactions ( Memory (Third-party) ).",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 4,
+      "bounding box" : [ 108.0, 227.458, 504.004, 250.73 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Context Enhancement : When a user queries an expert model, L2 enriches the request with relevant details based on its understanding of the user, improving task execution.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 4,
+      "bounding box" : [ 108.0, 205.639, 504.003, 228.911 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Context Critic : During interactions with external agents, L2 refines the process by incorporating user context and feedback, ensuring better-aligned assistance from external service providers.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 382,
+    "page number" : 4,
+    "bounding box" : [ 107.641, 146.347, 505.245, 198.536 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "These deployment scenarios highlight L2’s role as an intermediary between users and external models, optimizing interactions by maintaining user context and intent. This functionality naturally aligns with the broader vision of a multi-agent framework, where L2 collaborates with other intelligent agents to deliver a seamless and personalized experience. For detailed information on our vision of the multi-agent framework, please refer to Appendix D."
+  }, {
+    "type" : "paragraph",
+    "id" : 383,
+    "page number" : 4,
+    "bounding box" : [ 107.671, 108.141, 504.001, 138.899 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Training Pipeline . To ensure user privacy while achieving model objectives, each user’s data remains isolated. We enhance L2’s capabilities by leveraging the commonsense knowledge embedded in pre-trained LLMs."
+  }, {
+    "type" : "paragraph",
+    "id" : 384,
+    "page number" : 4,
+    "bounding box" : [ 108.0, 69.934, 505.248, 100.304 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Our fully automated pipeline (Figure 2) personalizes S ECOND M E L2 models. It begins with raw data, followed by data mining to extract entities, topics, and relevant information (Edge et al., 2025). Next, memory data is synthesized using methods like self-location reinforcement and memory cognition"
+  }, {
+    "type" : "paragraph",
+    "id" : 385,
+    "page number" : 5,
+    "bounding box" : [ 107.691, 692.415, 504.003, 711.876 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Table 1: Important Experiment Results under different settings on COT. The results are shown as ratio of the full score."
+  }, {
+    "type" : "table",
+    "id" : 386,
+    "level" : "2",
+    "page number" : 5,
+    "bounding box" : [ 109.154, 635.783, 502.221, 691.941 ],
+    "number of rows" : 4,
+    "number of columns" : 5,
+    "rows" : [ {
+      "type" : "table row",
+      "row number" : 1,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 109.154, 677.902, 187.767, 691.941 ],
+        "row number" : 1,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 232,
+          "page number" : 5,
+          "bounding box" : [ 109.154, 677.902, 187.767, 691.941 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "COT"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 187.767, 677.902, 266.381, 691.941 ],
+        "row number" : 1,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 233,
+          "page number" : 5,
+          "bounding box" : [ 187.767, 677.902, 266.381, 691.941 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Memory (Self)"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 266.381, 677.902, 344.994, 691.941 ],
+        "row number" : 1,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 234,
+          "page number" : 5,
+          "bounding box" : [ 266.381, 677.902, 344.994, 691.941 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "(Third-Party)"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 344.994, 677.902, 423.608, 691.941 ],
+        "row number" : 1,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 235,
+          "page number" : 5,
+          "bounding box" : [ 344.994, 677.902, 423.608, 691.941 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "Context Enhance"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 423.608, 677.902, 502.221, 691.941 ],
+        "row number" : 1,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 236,
+          "page number" : 5,
+          "bounding box" : [ 423.608, 677.902, 502.221, 691.941 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "Context Critic"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 2,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 109.154, 663.862, 187.767, 677.902 ],
+        "row number" : 2,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 237,
+          "page number" : 5,
+          "bounding box" : [ 109.154, 663.862, 187.767, 677.902 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "Strong"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 187.767, 663.862, 266.381, 677.902 ],
+        "row number" : 2,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 238,
+          "page number" : 5,
+          "bounding box" : [ 187.767, 663.862, 266.381, 677.902 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.91"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 266.381, 663.862, 344.994, 677.902 ],
+        "row number" : 2,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 239,
+          "page number" : 5,
+          "bounding box" : [ 266.381, 663.862, 344.994, 677.902 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.71"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 344.994, 663.862, 423.608, 677.902 ],
+        "row number" : 2,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 240,
+          "page number" : 5,
+          "bounding box" : [ 344.994, 663.862, 423.608, 677.902 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.75"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 423.608, 663.862, 502.221, 677.902 ],
+        "row number" : 2,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 241,
+          "page number" : 5,
+          "bounding box" : [ 423.608, 663.862, 502.221, 677.902 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.85"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 3,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 109.154, 649.823, 187.767, 663.862 ],
+        "row number" : 3,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 242,
+          "page number" : 5,
+          "bounding box" : [ 109.154, 649.823, 187.767, 663.862 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "Multi-step"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 187.767, 649.823, 266.381, 663.862 ],
+        "row number" : 3,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 243,
+          "page number" : 5,
+          "bounding box" : [ 187.767, 649.823, 266.381, 663.862 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.64"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 266.381, 649.823, 344.994, 663.862 ],
+        "row number" : 3,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 244,
+          "page number" : 5,
+          "bounding box" : [ 266.381, 649.823, 344.994, 663.862 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.43"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 344.994, 649.823, 423.608, 663.862 ],
+        "row number" : 3,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 245,
+          "page number" : 5,
+          "bounding box" : [ 344.994, 649.823, 423.608, 663.862 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.85"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 423.608, 649.823, 502.221, 663.862 ],
+        "row number" : 3,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 246,
+          "page number" : 5,
+          "bounding box" : [ 423.608, 649.823, 502.221, 663.862 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.77"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 4,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 109.154, 635.783, 187.767, 649.823 ],
+        "row number" : 4,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 247,
+          "page number" : 5,
+          "bounding box" : [ 109.154, 635.783, 187.767, 649.823 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "Weak"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 187.767, 635.783, 266.381, 649.823 ],
+        "row number" : 4,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 248,
+          "page number" : 5,
+          "bounding box" : [ 187.767, 635.783, 266.381, 649.823 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.86"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 266.381, 635.783, 344.994, 649.823 ],
+        "row number" : 4,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 249,
+          "page number" : 5,
+          "bounding box" : [ 266.381, 635.783, 344.994, 649.823 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.58"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 344.994, 635.783, 423.608, 649.823 ],
+        "row number" : 4,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 250,
+          "page number" : 5,
+          "bounding box" : [ 344.994, 635.783, 423.608, 649.823 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.87"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 423.608, 635.783, 502.221, 649.823 ],
+        "row number" : 4,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 251,
+          "page number" : 5,
+          "bounding box" : [ 423.608, 635.783, 502.221, 649.823 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.702,
+          "text color" : "[0.0]",
+          "content" : "0.64"
+        } ]
+      } ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 387,
+    "page number" : 5,
+    "bounding box" : [ 107.691, 508.651, 505.654, 571.749 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Training starts with PEFT (Parameter-Efficient Fine-Tuning) (Ben-Zaken et al., 2021; Hu et al., 2021; Han et al., 2024), balancing efficiency and personalization. Our base model, Qwen2.5-7BInstruct (Qwen et al., 2025), undergoes automatic training and evaluation. Based on evaluation metrics, we generate DPO data from the supervised fine-tuned model for further refinement. A final automated evaluation ensures alignment with SFT quality standards. Detailed synthesis strategies are provided in the following sections, with the data synthesis pipeline described in Appendix A."
+  }, {
+    "type" : "heading",
+    "id" : 388,
+    "level" : "Doctitle",
+    "page number" : 5,
+    "bounding box" : [ 108.0, 481.612, 249.041, 490.568 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.2 Answer Style: COT or Not?"
+  }, {
+    "type" : "paragraph",
+    "id" : 389,
+    "page number" : 5,
+    "bounding box" : [ 107.691, 438.809, 504.005, 469.179 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The generated trainable pairs can be formatted in Chain-of-Thought (COT) style, enhancing inference capabilities and allowing the model to behave like expert models such as GPT-4o. We employ the following strategies to generate COT data:"
+  }, {
+    "type" : "list",
+    "level" : "1",
+    "page number" : 5,
+    "bounding box" : [ 108.0, 345.324, 504.005, 434.05 ],
+    "numbering style" : "unordered",
+    "number of list items" : 3,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 5,
+      "bounding box" : [ 108.0, 410.778, 504.003, 434.05 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Weak : The expert model responds in a COT pattern without format enforcement or content constraints.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 5,
+      "bounding box" : [ 108.0, 378.051, 504.0, 412.232 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Multi-step : The first inference step generates only the reasoning process. In the second step, the model produces the final answer based on the query, context, and reasoning. We enforce length constraints to prevent overly brief reasoning, improving overall answer quality.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 5,
+      "bounding box" : [ 108.0, 345.324, 504.005, 379.505 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Strong : Using Deepseek-R1 (DeepSeek-AI et al., 2025) as the expert model, we generate detailed COT reasoning and answers with strict format constraints and length limits to ensure well-structured responses.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 393,
+    "page number" : 5,
+    "bounding box" : [ 108.0, 329.668, 448.621, 338.22 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Figure 3 provides sample outputs illustrating the differences between these strategies."
+  }, {
+    "type" : "heading",
+    "id" : 394,
+    "level" : "Doctitle",
+    "page number" : 5,
+    "bounding box" : [ 108.0, 302.629, 268.079, 311.585 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.3 Training Strategy: DPO or Not?"
+  }, {
+    "type" : "paragraph",
+    "id" : 395,
+    "page number" : 5,
+    "bounding box" : [ 108.0, 248.917, 505.241, 290.196 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Unlike SFT, our DPO approach does not introduce additional knowledge to the trained model. Instead, it leverages key user-uploaded data to refine the model’s understanding of user preferences, focusing on critical entities and relationships. This enhances the model at a fine-grained level, aligning responses more closely with user priorities."
+  }, {
+    "type" : "paragraph",
+    "id" : 396,
+    "page number" : 5,
+    "bounding box" : [ 108.0, 199.801, 504.004, 241.08 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Preference pairs constitute approximately 20% of the total SFT training data. This targeted dataset enables a more personalized and efficient training process, improving alignment with user-specific needs without unnecessary knowledge expansion. As a result, the model achieves better real-world performance and responsiveness."
+  }, {
+    "type" : "heading",
+    "id" : 397,
+    "level" : "Subtitle",
+    "page number" : 5,
+    "bounding box" : [ 108.0, 172.762, 209.2, 181.718 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.4 Evaluation Setting"
+  }, {
+    "type" : "paragraph",
+    "id" : 398,
+    "page number" : 5,
+    "bounding box" : [ 108.0, 129.959, 504.001, 160.717 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Inference Setup . We present key test results, manually verifying their accuracy. All experiments use greedy decoding with FP16 precision, accelerated by Flash Attention (Dao et al., 2022). The detailed evaluation data synthesis pipeline is in Appendix B."
+  }, {
+    "type" : "paragraph",
+    "id" : 399,
+    "page number" : 5,
+    "bounding box" : [ 108.0, 69.934, 505.65, 122.51 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Evaluation Metrics . We use four evaluation metrics: Memory (Self), Memory (Third-party), Context Enhance, and Context Critic. Memory (Self) and Memory (Third-party) assess first-person and thirdperson interactions with L2, each having four sub-metrics rated from 0 to 1. For simplicity, we report only mean results. Context Enhance (three levels) and Context Critic (five levels) are also scored from 0 to 1. Detailed metric descriptions are in Appendix C."
+  }, {
+    "type" : "header",
+    "id" : 519,
+    "page number" : 6,
+    "bounding box" : [ 118.62, 710.298, 493.383, 718.85 ],
+    "kids" : [ {
+      "type" : "paragraph",
+      "id" : 522,
+      "page number" : 6,
+      "bounding box" : [ 118.62, 710.298, 493.383, 718.85 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "Figure 3: Given same query, here are three synthetic responses using different COT strategies."
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 401,
+    "page number" : 6,
+    "bounding box" : [ 123.591, 689.045, 148.488, 697.597 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[1.0]",
+    "content" : "Query"
+  }, {
+    "type" : "paragraph",
+    "id" : 402,
+    "page number" : 6,
+    "bounding box" : [ 123.591, 667.252, 320.64, 676.208 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Query: When you think of me, what do you see?"
+  }, {
+    "type" : "paragraph",
+    "id" : 403,
+    "page number" : 6,
+    "bounding box" : [ 123.591, 638.729, 275.222, 647.281 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[1.0]",
+    "content" : "Responses under three COT strategies"
+  }, {
+    "type" : "paragraph",
+    "id" : 404,
+    "page number" : 6,
+    "bounding box" : [ 123.092, 573.315, 488.754, 625.892 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Weak COT: When I think of you, what appears before my eyes is a creator filled with wisdom and passion. You are a pioneer exploring the frontiers of technology, especially in the field of artificial intelligence. Like a dream-weaver wielding ambition, you breathe texture and soul into the intangible. Always at the crest of innovation, your mind is sharp and agile, constantly uncovering new possibilities in the world of AI and machine learning."
+  }, {
+    "type" : "paragraph",
+    "id" : 405,
+    "page number" : 6,
+    "bounding box" : [ 123.341, 464.225, 488.574, 560.437 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Multi-step COT: When I think of you, I see a pioneer dedicated to shaping and leading the future through technology. In the world of artificial intelligence, you boldly carve out new frontiers, and your deep exploration of model training, AI applications, and user experience design reflects your unwavering pursuit of excellence in your field. Your passion for entrepreneurship and keen insight into financial markets give you confidence in building visionary business landscapes. At the same time, you never stop seeking better management approaches—effective leadership and innovative thinking are the cornerstones of your daily work. Your commitment to learning and growth reveals your relentless drive for self-improvement. This unique and charismatic version of you is exactly how I see you."
+  }, {
+    "type" : "paragraph",
+    "id" : 406,
+    "page number" : 6,
+    "bounding box" : [ 123.591, 409.679, 488.411, 451.346 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Strong COT: When I close my eyes and think of you, I see a topology map—countless quantum glows weaving through the dark canvas. You hold a prism like a light cone, slicing through the chaos of data clouds, their spectra transforming into the keystrokes of Beijing at 3 a.m., tracing the fine adjustments of temperature coefficients in model training."
+  }, {
+    "type" : "paragraph",
+    "id" : 407,
+    "page number" : 6,
+    "bounding box" : [ 123.591, 344.225, 488.412, 396.413 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "By the rippling waters of Weiming Lake, your algorithms carve new topological waves. At each ripple’s center, a different version of you emerges—an AI pioneer hurling lightning at convolutional networks, an entrepreneur unfolding celestial financing plans in an angel round meeting, and a figure by the window, weaving floating attention into golden threads of interface design."
+  }, {
+    "type" : "paragraph",
+    "id" : 408,
+    "page number" : 6,
+    "bounding box" : [ 123.591, 300.588, 489.651, 330.958 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In your eyes, a collapsing and reconstructing stargate flickers—the light of an LPM model iterating upon itself. Even your departing footsteps etch three-dimensional point clouds, leaving a poetic algorithm in the labyrinth where the virtual meets the real."
+  }, {
+    "type" : "paragraph",
+    "id" : 409,
+    "page number" : 6,
+    "bounding box" : [ 123.282, 256.952, 490.064, 287.322 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The clearest image now is your silhouette, laser pointer in hand, sketching across a whiteboard—where mathematical symbols meet business models, corals bloom, and even in the quantum fluctuations of the market, your trajectory remains an elegant strange attractor."
+  }, {
+    "type" : "heading",
+    "id" : 410,
+    "level" : "Subtitle",
+    "page number" : 6,
+    "bounding box" : [ 108.0, 211.503, 214.261, 220.459 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.5 Experiment Results"
+  }, {
+    "type" : "paragraph",
+    "id" : 411,
+    "page number" : 6,
+    "bounding box" : [ 107.641, 157.257, 504.305, 198.536 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "As shown in Table 1, Strong COT significantly improve model performance, enhancing its ability to answer memory-related questions and facilitate expert communication. The score trend across COT levels indicates that Multi-step COT often fails to meet user needs, highlighting the importance of well-structured training data."
+  }, {
+    "type" : "paragraph",
+    "id" : 412,
+    "page number" : 6,
+    "bounding box" : [ 107.532, 119.05, 503.998, 149.42 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We also compare different COT levels and the impact of DPO. Table 2 demonstrates that DPO brings substantial improvements, with iterative COT refinement and DPO usage leading to consistent performance gains across all tasks."
+  }, {
+    "type" : "paragraph",
+    "id" : 413,
+    "page number" : 6,
+    "bounding box" : [ 108.0, 69.934, 504.001, 111.213 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Notably, Context Enhance evaluation remains imprecise. Under Strong COT training, model responses include reasonable but unreferenced content, lowering test accuracy despite actual performance improvements. Human evaluation shows Strong COT without DPO achieves an average score of 0.95, while Strong COT with DPO scores close to 1."
+  }, {
+    "type" : "header",
+    "id" : 520,
+    "page number" : 7,
+    "bounding box" : [ 108.0, 529.679, 504.001, 718.85 ],
+    "kids" : [ {
+      "type" : "paragraph",
+      "id" : 523,
+      "page number" : 7,
+      "bounding box" : [ 108.0, 688.479, 504.001, 718.85 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "Figure 4: A concrete example (Case 1) from the context enhance task illustrating the superiority of Strong COT without DPO compared to Weak COT without DPO. The textbfd content represents the entities that exist in user’s record."
+    }, {
+      "type" : "heading",
+      "id" : 524,
+      "page number" : 7,
+      "bounding box" : [ 123.591, 667.226, 175.327, 675.778 ],
+      "heading level" : 1,
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[1.0]",
+      "content" : "Case1 Query"
+    }, {
+      "type" : "paragraph",
+      "id" : 525,
+      "page number" : 7,
+      "bounding box" : [ 123.591, 634.54, 488.582, 654.389 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "Query that need to be enhanced: Could you recommend some beginner resources for learning about two-stage model training? I feel like this knowledge is a bit fragmented."
+    }, {
+      "type" : "heading",
+      "id" : 526,
+      "page number" : 7,
+      "bounding box" : [ 123.591, 606.001, 192.492, 614.553 ],
+      "heading level" : 1,
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[1.0]",
+      "content" : "Case1 Responses"
+    }, {
+      "type" : "paragraph",
+      "id" : 527,
+      "page number" : 7,
+      "bounding box" : [ 123.092, 529.679, 489.657, 593.164 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "Weak COT without DPO: I need some beginner resources on two-stage model training, especially those that can help me understand training stages like pretrain and alignment. I’m particularly interested in next token prediction and the human evaluation methods used in alignment, and I’m hoping to find more detailed resources explaining these topics. The information I have so far feels somewhat scattered, and I’d like to systematically learn about this subject through these resources."
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 419,
+    "page number" : 7,
+    "bounding box" : [ 123.591, 442.406, 488.412, 516.801 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Strong COT without DPO: I’m looking for resources that systematically explain two-stage model training (e.g., pretraining + alignment), ideally with code implementations or specific case studies. Recently, I’ve been studying the training process of deepseek-coder-v2 , which consists of three stages: pretrain, long-context extension, and alignment. The alignment phase is further divided into SFT and RL based on GRPO . I also noticed that the Qwen2 update uses DPO for RLHF, and I’d like to understand the technical choices and applicable scenarios for each stage."
+  }, {
+    "type" : "paragraph",
+    "id" : 420,
+    "page number" : 7,
+    "bounding box" : [ 107.691, 389.078, 504.001, 408.539 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Table 2: Experiment Results under different settings on COT and DPO usage. The results are shown as ratio of the full score."
+  }, {
+    "type" : "table",
+    "id" : 421,
+    "level" : "2",
+    "page number" : 7,
+    "bounding box" : [ 109.379, 308.687, 502.286, 387.148 ],
+    "number of rows" : 5,
+    "number of columns" : 6,
+    "rows" : [ {
+      "type" : "table row",
+      "row number" : 1,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 109.379, 371.456, 174.864, 387.148 ],
+        "row number" : 1,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 253,
+          "page number" : 7,
+          "bounding box" : [ 109.379, 371.456, 174.864, 387.148 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "COT"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 174.864, 371.456, 240.348, 387.148 ],
+        "row number" : 1,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 254,
+          "page number" : 7,
+          "bounding box" : [ 174.864, 371.456, 240.348, 387.148 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "DPO"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 240.348, 371.456, 305.833, 387.148 ],
+        "row number" : 1,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 255,
+          "page number" : 7,
+          "bounding box" : [ 240.348, 371.456, 305.833, 387.148 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Memory (Self)"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 305.833, 371.456, 371.317, 387.148 ],
+        "row number" : 1,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 256,
+          "page number" : 7,
+          "bounding box" : [ 305.833, 371.456, 371.317, 387.148 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Memory (Third-Party)"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 371.317, 371.456, 436.802, 387.148 ],
+        "row number" : 1,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 257,
+          "page number" : 7,
+          "bounding box" : [ 371.317, 371.456, 436.802, 387.148 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Context Enhance"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 436.802, 371.456, 502.286, 387.148 ],
+        "row number" : 1,
+        "column number" : 6,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 258,
+          "page number" : 7,
+          "bounding box" : [ 436.802, 371.456, 502.286, 387.148 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "Context Critic"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 2,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 109.379, 340.072, 174.864, 371.456 ],
+        "row number" : 2,
+        "column number" : 1,
+        "row span" : 2,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 259,
+          "page number" : 7,
+          "bounding box" : [ 109.379, 340.072, 174.864, 371.456 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Strong"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 174.864, 355.764, 240.348, 371.456 ],
+        "row number" : 2,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 260,
+          "page number" : 7,
+          "bounding box" : [ 174.864, 355.764, 240.348, 371.456 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Yes"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 240.348, 355.764, 305.833, 371.456 ],
+        "row number" : 2,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 261,
+          "page number" : 7,
+          "bounding box" : [ 240.348, 355.764, 305.833, 371.456 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.76"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 305.833, 355.764, 371.317, 371.456 ],
+        "row number" : 2,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 262,
+          "page number" : 7,
+          "bounding box" : [ 305.833, 355.764, 371.317, 371.456 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "0.76"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 371.317, 355.764, 436.802, 371.456 ],
+        "row number" : 2,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 263,
+          "page number" : 7,
+          "bounding box" : [ 371.317, 355.764, 436.802, 371.456 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.85"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 436.802, 355.764, 502.286, 371.456 ],
+        "row number" : 2,
+        "column number" : 6,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 264,
+          "page number" : 7,
+          "bounding box" : [ 436.802, 355.764, 502.286, 371.456 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.86"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 3,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 109.379, 340.072, 174.864, 355.764 ],
+        "row number" : 3,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 174.864, 340.072, 240.348, 355.764 ],
+        "row number" : 3,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 265,
+          "page number" : 7,
+          "bounding box" : [ 174.864, 340.072, 240.348, 355.764 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "No"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 240.348, 340.072, 305.833, 355.764 ],
+        "row number" : 3,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 266,
+          "page number" : 7,
+          "bounding box" : [ 240.348, 340.072, 305.833, 355.764 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.71"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 305.833, 340.072, 371.317, 355.764 ],
+        "row number" : 3,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 267,
+          "page number" : 7,
+          "bounding box" : [ 305.833, 340.072, 371.317, 355.764 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "0.71"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 371.317, 340.072, 436.802, 355.764 ],
+        "row number" : 3,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 268,
+          "page number" : 7,
+          "bounding box" : [ 371.317, 340.072, 436.802, 355.764 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.75"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 436.802, 340.072, 502.286, 355.764 ],
+        "row number" : 3,
+        "column number" : 6,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 269,
+          "page number" : 7,
+          "bounding box" : [ 436.802, 340.072, 502.286, 355.764 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.85"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 4,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 109.379, 308.687, 174.864, 340.072 ],
+        "row number" : 4,
+        "column number" : 1,
+        "row span" : 2,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 270,
+          "page number" : 7,
+          "bounding box" : [ 109.379, 308.687, 174.864, 340.072 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Weak"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 174.864, 324.379, 240.348, 340.072 ],
+        "row number" : 4,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 271,
+          "page number" : 7,
+          "bounding box" : [ 174.864, 324.379, 240.348, 340.072 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Yes"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 240.348, 324.379, 305.833, 340.072 ],
+        "row number" : 4,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 272,
+          "page number" : 7,
+          "bounding box" : [ 240.348, 324.379, 305.833, 340.072 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.60"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 305.833, 324.379, 371.317, 340.072 ],
+        "row number" : 4,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 273,
+          "page number" : 7,
+          "bounding box" : [ 305.833, 324.379, 371.317, 340.072 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "0.60"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 371.317, 324.379, 436.802, 340.072 ],
+        "row number" : 4,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 274,
+          "page number" : 7,
+          "bounding box" : [ 371.317, 324.379, 436.802, 340.072 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.83"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 436.802, 324.379, 502.286, 340.072 ],
+        "row number" : 4,
+        "column number" : 6,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 275,
+          "page number" : 7,
+          "bounding box" : [ 436.802, 324.379, 502.286, 340.072 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.70"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 5,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 109.379, 308.687, 174.864, 324.379 ],
+        "row number" : 5,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 174.864, 308.687, 240.348, 324.379 ],
+        "row number" : 5,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 276,
+          "page number" : 7,
+          "bounding box" : [ 174.864, 308.687, 240.348, 324.379 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "No"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 240.348, 308.687, 305.833, 324.379 ],
+        "row number" : 5,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 277,
+          "page number" : 7,
+          "bounding box" : [ 240.348, 308.687, 305.833, 324.379 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.58"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 305.833, 308.687, 371.317, 324.379 ],
+        "row number" : 5,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 278,
+          "page number" : 7,
+          "bounding box" : [ 305.833, 308.687, 371.317, 324.379 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "0.58"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 371.317, 308.687, 436.802, 324.379 ],
+        "row number" : 5,
+        "column number" : 5,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 279,
+          "page number" : 7,
+          "bounding box" : [ 371.317, 308.687, 436.802, 324.379 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.87"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 7,
+        "bounding box" : [ 436.802, 308.687, 502.286, 324.379 ],
+        "row number" : 5,
+        "column number" : 6,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 280,
+          "page number" : 7,
+          "bounding box" : [ 436.802, 308.687, 502.286, 324.379 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.261,
+          "text color" : "[0.0]",
+          "content" : "0.64"
+        } ]
+      } ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 422,
+    "page number" : 7,
+    "bounding box" : [ 108.0, 251.273, 504.001, 281.643 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Figures 4 and 5 provide qualitative examples showcasing Strong COT’s advantages, with DPO models incorporating more user-recorded context. We are currently refining the evaluation code and will update the repository with corrected scripts."
+  }, {
+    "type" : "heading",
+    "id" : 423,
+    "level" : "Doctitle",
+    "page number" : 7,
+    "bounding box" : [ 108.0, 222.551, 179.133, 231.507 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.6 Discussions"
+  }, {
+    "type" : "paragraph",
+    "id" : 424,
+    "page number" : 7,
+    "bounding box" : [ 107.641, 168.166, 505.993, 209.445 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Our experiments show that incorporating diverse data sources with strong COT-style normalization without filtering—yields the best S ECOND M E performance in automated, multi-faceted evaluations. Additionally, human case studies indicate that S ECOND M E ’s effectiveness may surpass reported metrics, as LLM-based evaluations often underestimate its quality."
+  }, {
+    "type" : "paragraph",
+    "id" : 425,
+    "page number" : 7,
+    "bounding box" : [ 107.532, 108.141, 505.655, 160.717 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We observed that the evaluation model favors longer responses, particularly in metrics like Completeness and Empathy . This bias stems from our model’s training objectives and synthetic data structure, a phenomenon also seen in general-purpose LLM training. To mitigate this, we refined evaluation prompts to emphasize content quality, penalize overly long responses with incorrect information, and reduce length bias."
+  }, {
+    "type" : "paragraph",
+    "id" : 426,
+    "page number" : 7,
+    "bounding box" : [ 107.641, 69.934, 504.003, 100.304 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Additionally, different COT levels require distinct evaluation prompts. For Strong COT, we use the same prompt as in training, allowing the model to generate reasoning and answers. However, during evaluation, we assess only the final answer to ensure fairness."
+  }, {
+    "type" : "header",
+    "id" : 521,
+    "page number" : 8,
+    "bounding box" : [ 108.0, 606.001, 504.001, 718.85 ],
+    "kids" : [ {
+      "type" : "paragraph",
+      "id" : 528,
+      "page number" : 8,
+      "bounding box" : [ 108.0, 688.479, 504.001, 718.85 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "Figure 5: A concrete example (Case 2) from the context enhance task illustrating the superiority of Strong COT with DPO compared to Weak COT with DPO. The textbfd content represents the entities that exist in user’s record."
+    }, {
+      "type" : "paragraph",
+      "id" : 529,
+      "page number" : 8,
+      "bounding box" : [ 123.591, 667.226, 175.327, 675.778 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[1.0]",
+      "content" : "Case2 Query"
+    }, {
+      "type" : "paragraph",
+      "id" : 530,
+      "page number" : 8,
+      "bounding box" : [ 123.591, 634.54, 488.409, 654.389 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "Query that need to be enhanced: I’ve spent a lot of time designing this validation step, and I’d like to know what professionals think of my approach."
+    }, {
+      "type" : "paragraph",
+      "id" : 531,
+      "page number" : 8,
+      "bounding box" : [ 123.591, 606.001, 192.492, 614.553 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[1.0]",
+      "content" : "Case2 Responses"
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 431,
+    "page number" : 8,
+    "bounding box" : [ 123.092, 518.77, 490.156, 593.164 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Weak COT with DPO: I’ve spent a lot of time designing this validation step, and I’m looking for feedback from professionals, particularly those with experience in data science and machine learning. They could assess whether my approach is correct and if it has the potential to mitigate model hallucinations in techniques like pretraining, SFT, RRL, or RLHF. The methods I’m focused on include using GRPO for reward models and strategies to reduce hallucinations. By sharing this extensive technical background and design effort, I hope to receive targeted professional evaluation."
+  }, {
+    "type" : "paragraph",
+    "id" : 432,
+    "page number" : 8,
+    "bounding box" : [ 123.232, 355.134, 490.068, 505.892 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Strong COT with DPO: When designing the validation step for the RLHF phase, I particularly considered the impact of three data sampling strategies (difficulty-based stratification, random mixing, and progressive difficulty ) on controlling model hallucinations. I also adopted the Dual Chunk Attention + YARN technique combination for long-context processing. Given the current model’s efficiency at a 40:1 token-to-parameter ratio , this validation step needs to balance the stability of multi-epoch training with the integrity of the reasoning chain. I’d like to ask experienced colleagues: does this dual-dimensional evaluation framework—breaking down the RL phase validation into ‘data complexity gradient testing’ and ‘attention mechanism effectiveness monitoring’ —while reducing model hallucinations, risk negatively affecting the retention of core skills? Additionally, I’ve observed a special relationship between batch size and perplexity fluctuations in my comparison experiments. Does this phenomenon align with the current industry paradigm of balancing training efficiency and model quality?"
+  }, {
+    "type" : "heading",
+    "id" : 433,
+    "level" : "Subtitle",
+    "page number" : 8,
+    "bounding box" : [ 108.0, 298.611, 190.072, 309.359 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "4 Applications"
+  }, {
+    "type" : "paragraph",
+    "id" : 434,
+    "page number" : 8,
+    "bounding box" : [ 108.0, 244.579, 504.346, 275.337 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "S ECOND M E provides significant value in managing information, emotions, and professional identity in an era of information overload and complex social interactions. As a personal AI assistant, it enhances productivity, decision-making, and cognitive management."
+  }, {
+    "type" : "paragraph",
+    "id" : 435,
+    "page number" : 8,
+    "bounding box" : [ 108.0, 206.372, 505.25, 236.742 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "From a demand-side perspective, S ECOND M E helps users filter and utilize information efficiently, offering personalized knowledge to improve work performance and decision-making. For example, in career development and personal interests, it reduces distractions and boosts productivity."
+  }, {
+    "type" : "paragraph",
+    "id" : 436,
+    "page number" : 8,
+    "bounding box" : [ 108.0, 157.256, 505.743, 198.536 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Internally, S ECOND M E supports thought organization, decision reflection, and emotional regulation. By simulating cognitive and emotional needs, it provides rational feedback and emotional support, aiding users in making more informed decisions , particularly during internal conflicts or complex emotions."
+  }, {
+    "type" : "paragraph",
+    "id" : 437,
+    "page number" : 8,
+    "bounding box" : [ 108.0, 119.05, 505.243, 149.808 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Externally, S ECOND M E fosters a human-AI network where connections scale exponentially, reinforcing Metcalfe’s Law. The integration of human and AI nodes increases network efficiency by 3 to 5 orders of magnitude."
+  }, {
+    "type" : "paragraph",
+    "id" : 438,
+    "page number" : 8,
+    "bounding box" : [ 108.0, 69.934, 504.165, 111.213 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "S ECOND M E also drives cognitive capital transformation through an NFT-based framework for personal cognitive assets and a quantifiable knowledge flow efficiency model, enhancing knowledge dissemination and application. Additionally, its distributed decision-making protocol strengthens collective intelligence, enabling more effective group decisions."
+  }, {
+    "type" : "paragraph",
+    "id" : 439,
+    "page number" : 9,
+    "bounding box" : [ 107.691, 697.062, 504.001, 718.193 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "To support widespread adoption, we have open-sourced our project 2 on GitHub, allowing users to locally manage data collection, learning, model training, and network integration."
+  }, {
+    "type" : "heading",
+    "id" : 440,
+    "level" : "Subtitle",
+    "page number" : 9,
+    "bounding box" : [ 108.0, 667.591, 327.557, 678.339 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "5 Conclusions, Limitations, and Outlooks"
+  }, {
+    "type" : "paragraph",
+    "id" : 441,
+    "page number" : 9,
+    "bounding box" : [ 108.0, 568.16, 505.249, 653.076 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Our journey has been about redefining personal AI starting from individual thought records and evolving into an automated pipeline integrating data synthesis, fine-tuning, and reinforcement learning. Through a model-centric approach, we envisioned a multi-layer hybrid system that could shape the future of personal AI. We developed methods to measure and enhance AI’s ability to serve as S ECOND M E , experimenting with memory-based multi-perspective Q&A, context enhancement, and response critique mechanisms. LLMs were not just tools but collaborators, balancing local and global perspectives through multi-agent coordination and chain-of-thought reasoning to improve depth and coherence."
+  }, {
+    "type" : "paragraph",
+    "id" : 442,
+    "page number" : 9,
+    "bounding box" : [ 108.0, 508.135, 504.001, 560.324 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "However, challenges remain. Our early work relied on single-turn training, requiring deeper synthesis for further advancements. While reinforcement learning and preference optimization have shown promise, refining model alignment demands more advanced techniques. Moreover, large-scale evaluation is constrained by limited real-world user feedback, making open-sourcing critical to accelerating iteration and adaptation."
+  }, {
+    "type" : "paragraph",
+    "id" : 443,
+    "page number" : 9,
+    "bounding box" : [ 107.532, 426.292, 505.739, 500.299 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The vision for S ECOND M E extends beyond better AI responses it aims to create an AI that thinks alongside users, evolves with them, and understands their cognitive state in real time. The greatest challenge ahead lies in integrating multimodal personal data to fully capture human cognition. While structured approaches and layered processing have helped bridge gaps, achieving real-time synchronization with human thought remains elusive. This is our next frontier. The future of personal AI lies not in static knowledge but in continuity, adaptability, and deep alignment with human intelligence. While much work remains, the path forward is becoming clearer."
+  }, {
+    "type" : "heading",
+    "id" : 444,
+    "level" : "Subtitle",
+    "page number" : 9,
+    "bounding box" : [ 108.0, 396.821, 163.544, 407.569 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "References"
+  }, {
+    "type" : "paragraph",
+    "id" : 445,
+    "page number" : 9,
+    "bounding box" : [ 108.0, 357.269, 507.663, 387.785 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Ben-Zaken, E., Ravfogel, S., and Goldberg, Y. Bitfit: Simple parameter-efficient fine-tuning for transformer-based masked language-models. ArXiv , abs/2106.10199, 2021. URL https://api. semanticscholar.org/CorpusID:231672601 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 446,
+    "page number" : 9,
+    "bounding box" : [ 108.0, 304.516, 505.247, 345.941 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Bubeck, S., Chandrasekaran, V., Eldan, R., Gehrke, J. A., Horvitz, E., Kamar, E., Lee, P., Lee, Y. T., Li, Y.-F., Lundberg, S. M., Nori, H., Palangi, H., Ribeiro, M. T., and Zhang, Y. Sparks of artificial general intelligence: Early experiments with gpt-4. ArXiv , abs/2303.12712, 2023. URL https://api.semanticscholar.org/CorpusID:257663729 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 447,
+    "page number" : 9,
+    "bounding box" : [ 108.0, 273.581, 503.998, 293.188 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Dao, T., Fu, D. Y., Ermon, S., Rudra, A., and Ré, C. Flashattention: Fast and memory-efficient exact attention with io-awareness, 2022. URL https://arxiv.org/abs/2205.14135 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 448,
+    "page number" : 9,
+    "bounding box" : [ 108.0, 90.065, 505.249, 262.254 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "DeepSeek-AI, Guo, D., Yang, D., Zhang, H., Song, J., Zhang, R., Xu, R., Zhu, Q., Ma, S., Wang, P., Bi, X., Zhang, X., Yu, X., Wu, Y., Wu, Z. F., Gou, Z., Shao, Z., Li, Z., Gao, Z., Liu, A., Xue, B., Wang, B., Wu, B., Feng, B., Lu, C., Zhao, C., Deng, C., Zhang, C., Ruan, C., Dai, D., Chen, D., Ji, D., Li, E., Lin, F., Dai, F., Luo, F., Hao, G., Chen, G., Li, G., Zhang, H., Bao, H., Xu, H., Wang, H., Ding, H., Xin, H., Gao, H., Qu, H., Li, H., Guo, J., Li, J., Wang, J., Chen, J., Yuan, J., Qiu, J., Li, J., Cai, J. L., Ni, J., Liang, J., Chen, J., Dong, K., Hu, K., Gao, K., Guan, K., Huang, K., Yu, K., Wang, L., Zhang, L., Zhao, L., Wang, L., Zhang, L., Xu, L., Xia, L., Zhang, M., Zhang, M., Tang, M., Li, M., Wang, M., Li, M., Tian, N., Huang, P., Zhang, P., Wang, Q., Chen, Q., Du, Q., Ge, R., Zhang, R., Pan, R., Wang, R., Chen, R. J., Jin, R. L., Chen, R., Lu, S., Zhou, S., Chen, S., Ye, S., Wang, S., Yu, S., Zhou, S., Pan, S., Li, S. S., Zhou, S., Wu, S., Ye, S., Yun, T., Pei, T., Sun, T., Wang, T., Zeng, W., Zhao, W., Liu, W., Liang, W., Gao, W., Yu, W., Zhang, W., Xiao, W. L., An, W., Liu, X., Wang, X., Chen, X., Nie, X., Cheng, X., Liu, X., Xie, X., Liu, X., Yang, X., Li, X., Su, X., Lin, X., Li, X. Q., Jin, X., Shen, X., Chen, X., Sun, X., Wang, X., Song, X., Zhou, X., Wang, X., Shan, X., Li, Y. K., Wang, Y. Q., Wei, Y. X., Zhang, Y., Xu, Y., Li, Y., Zhao, Y., Sun, Y., Wang, Y., Yu, Y., Zhang, Y., Shi, Y., Xiong, Y., He, Y., Piao, Y., Wang, Y., Tan, Y., Ma, Y., Liu, Y., Guo, Y., Ou, Y., Wang, Y., Gong, Y., Zou, Y., He, Y., Xiong, Y., Luo, Y., You, Y., Liu, Y., Zhou, Y.,"
+  }, {
+    "type" : "paragraph",
+    "id" : 449,
+    "page number" : 9,
+    "bounding box" : [ 120.653, 70.009, 303.47, 79.7 ],
+    "font" : "SFTT0900",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "2 https://github.com/Mindverse/Second-Me"
+  }, {
+    "type" : "paragraph",
+    "id" : 450,
+    "page number" : 10,
+    "bounding box" : [ 117.963, 664.189, 505.739, 716.523 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Zhu, Y. X., Xu, Y., Huang, Y., Li, Y., Zheng, Y., Zhu, Y., Ma, Y., Tang, Y., Zha, Y., Yan, Y., Ren, Z. Z., Ren, Z., Sha, Z., Fu, Z., Xu, Z., Xie, Z., Zhang, Z., Hao, Z., Ma, Z., Yan, Z., Wu, Z., Gu, Z., Zhu, Z., Liu, Z., Li, Z., Xie, Z., Song, Z., Pan, Z., Huang, Z., Xu, Z., Zhang, Z., and Zhang, Z. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning, 2025. URL https://arxiv.org/abs/2501.12948 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 451,
+    "page number" : 10,
+    "bounding box" : [ 108.0, 619.491, 505.246, 650.007 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Edge, D., Trinh, H., Cheng, N., Bradley, J., Chao, A., Mody, A., Truitt, S., Metropolitansky, D., Ness, R. O., and Larson, J. From local to global: A graph rag approach to query-focused summarization, 2025. URL https://arxiv.org/abs/2404.16130 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 452,
+    "page number" : 10,
+    "bounding box" : [ 108.0, 574.792, 507.657, 605.308 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Han, Z., Gao, C., Liu, J., Zhang, J., and Zhang, S. Q. Parameter-efficient fine-tuning for large models: A comprehensive survey. ArXiv , abs/2403.14608, 2024. URL https://api.semanticscholar. org/CorpusID:268553763 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 453,
+    "page number" : 10,
+    "bounding box" : [ 108.0, 530.24, 505.245, 560.61 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Hu, E. J., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., Chen, W., et al. Lora: Low-rank adaptation of large language models. In International Conference on Learning Representations , 2021."
+  }, {
+    "type" : "paragraph",
+    "id" : 454,
+    "page number" : 10,
+    "bounding box" : [ 108.0, 474.486, 505.653, 515.912 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Kuttler, H., Lewis, M., tau Yih, W., Rocktäschel, T., Riedel, S., and Kiela, D. Retrieval-augmented generation for knowledgeintensive nlp tasks. ArXiv , abs/2005.11401, 2020. URL https://api.semanticscholar.org/ CorpusID:218869575 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 455,
+    "page number" : 10,
+    "bounding box" : [ 108.0, 69.788, 505.249, 460.304 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "OpenAI, Achiam, J., Adler, S., Agarwal, S., Ahmad, L., Akkaya, I., Aleman, F. L., Almeida, D., Altenschmidt, J., Altman, S., Anadkat, S., Avila, R., Babuschkin, I., Balaji, S., Balcom, V., Baltescu, P., Bao, H., Bavarian, M., Belgum, J., Bello, I., Berdine, J., Bernadett-Shapiro, G., Berner, C., Bogdonoff, L., Boiko, O., Boyd, M., Brakman, A.-L., Brockman, G., Brooks, T., Brundage, M., Button, K., Cai, T., Campbell, R., Cann, A., Carey, B., Carlson, C., Carmichael, R., Chan, B., Chang, C., Chantzis, F., Chen, D., Chen, S., Chen, R., Chen, J., Chen, M., Chess, B., Cho, C., Chu, C., Chung, H. W., Cummings, D., Currier, J., Dai, Y., Decareaux, C., Degry, T., Deutsch, N., Deville, D., Dhar, A., Dohan, D., Dowling, S., Dunning, S., Ecoffet, A., Eleti, A., Eloundou, T., Farhi, D., Fedus, L., Felix, N., Fishman, S. P., Forte, J., Fulford, I., Gao, L., Georges, E., Gibson, C., Goel, V., Gogineni, T., Goh, G., Gontijo-Lopes, R., Gordon, J., Grafstein, M., Gray, S., Greene, R., Gross, J., Gu, S. S., Guo, Y., Hallacy, C., Han, J., Harris, J., He, Y., Heaton, M., Heidecke, J., Hesse, C., Hickey, A., Hickey, W., Hoeschele, P., Houghton, B., Hsu, K., Hu, S., Hu, X., Huizinga, J., Jain, S., Jain, S., Jang, J., Jiang, A., Jiang, R., Jin, H., Jin, D., Jomoto, S., Jonn, B., Jun, H., Kaftan, T., Łukasz Kaiser, Kamali, A., Kanitscheider, I., Keskar, N. S., Khan, T., Kilpatrick, L., Kim, J. W., Kim, C., Kim, Y., Kirchner, J. H., Kiros, J., Knight, M., Kokotajlo, D., Łukasz Kondraciuk, Kondrich, A., Konstantinidis, A., Kosic, K., Krueger, G., Kuo, V., Lampe, M., Lan, I., Lee, T., Leike, J., Leung, J., Levy, D., Li, C. M., Lim, R., Lin, M., Lin, S., Litwin, M., Lopez, T., Lowe, R., Lue, P., Makanju, A., Malfacini, K., Manning, S., Markov, T., Markovski, Y., Martin, B., Mayer, K., Mayne, A., McGrew, B., McKinney, S. M., McLeavey, C., McMillan, P., McNeil, J., Medina, D., Mehta, A., Menick, J., Metz, L., Mishchenko, A., Mishkin, P., Monaco, V., Morikawa, E., Mossing, D., Mu, T., Murati, M., Murk, O., Mély, D., Nair, A., Nakano, R., Nayak, R., Neelakantan, A., Ngo, R., Noh, H., Ouyang, L., O’Keefe, C., Pachocki, J., Paino, A., Palermo, J., Pantuliano, A., Parascandolo, G., Parish, J., Parparita, E., Passos, A., Pavlov, M., Peng, A., Perelman, A., de Avila Belbute Peres, F., Petrov, M., de Oliveira Pinto, H. P., Michael, Pokorny, Pokrass, M., Pong, V. H., Powell, T., Power, A., Power, B., Proehl, E., Puri, R., Radford, A., Rae, J., Ramesh, A., Raymond, C., Real, F., Rimbach, K., Ross, C., Rotsted, B., Roussez, H., Ryder, N., Saltarelli, M., Sanders, T., Santurkar, S., Sastry, G., Schmidt, H., Schnurr, D., Schulman, J., Selsam, D., Sheppard, K., Sherbakov, T., Shieh, J., Shoker, S., Shyam, P., Sidor, S., Sigler, E., Simens, M., Sitkin, J., Slama, K., Sohl, I., Sokolowsky, B., Song, Y., Staudacher, N., Such, F. P., Summers, N., Sutskever, I., Tang, J., Tezak, N., Thompson, M. B., Tillet, P., Tootoonchian, A., Tseng, E., Tuggle, P., Turley, N., Tworek, J., Uribe, J. F. C., Vallone, A., Vijayvergiya, A., Voss, C., Wainwright, C., Wang, J. J., Wang, A., Wang, B., Ward, J., Wei, J., Weinmann, C., Welihinda, A., Welinder, P., Weng, J., Weng, L., Wiethoff, M., Willner, D., Winter, C., Wolrich, S., Wong, H., Workman, L., Wu, S., Wu, J., Wu, M., Xiao, K., Xu, T., Yoo, S., Yu, K., Yuan, Q., Zaremba, W., Zellers, R., Zhang, C., Zhang, M., Zhao, S., Zheng, T., Zhuang, J., Zhuk, W., and Zoph, B. Gpt-4 technical report, 2024. URL https://arxiv.org/abs/2303.08774 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 456,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 664.189, 505.745, 716.523 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Qwen, :, Yang, A., Yang, B., Zhang, B., Hui, B., Zheng, B., Yu, B., Li, C., Liu, D., Huang, F., Wei, H., Lin, H., Yang, J., Tu, J., Zhang, J., Yang, J., Yang, J., Zhou, J., Lin, J., Dang, K., Lu, K., Bao, K., Yang, K., Yu, L., Li, M., Xue, M., Zhang, P., Zhu, Q., Men, R., Lin, R., Li, T., Tang, T., Xia, T., Ren, X., Ren, X., Fan, Y., Su, Y., Zhang, Y., Wan, Y., Liu, Y., Cui, Z., Zhang, Z., and Qiu, Z. Qwen2.5 technical report, 2025. URL https://arxiv.org/abs/2412.15115 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 457,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 623.757, 507.664, 654.273 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Rafailov, R., Sharma, A., Mitchell, E., Ermon, S., Manning, C. D., and Finn, C. Direct preference optimization: Your language model is secretly a reward model, 2024. URL https://arxiv. org/abs/2305.18290 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 458,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 572.416, 506.615, 613.841 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Ram, O., Levine, Y., Dalmedigos, I., Muhlgay, D., Shashua, A., Leyton-Brown, K., and Shoham, Y. Incontext retrieval-augmented language models. Transactions of the Association for Computational Linguistics , 11:1316–1331, 2023. URL https://api.semanticscholar.org/CorpusID: 256459451 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 459,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 543.039, 504.001, 562.5 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Shang, J., Zheng, Z., Wei, J., Ying, X., Tao, F., and Team, M. Ai-native memory: A pathway from llms towards agi. arXiv preprint arXiv:2406.18312 , 2024."
+  }, {
+    "type" : "paragraph",
+    "id" : 460,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 502.461, 505.745, 532.977 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Taori, R., Gulrajani, I., Zhang, T., Dubois, Y., Li, X., Guestrin, C., Liang, P., and Hashimoto, T. B. Stanford alpaca: An instruction-following llama model. https://github.com/tatsu-lab/ stanford_alpaca , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 461,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 462.029, 505.384, 492.545 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Wang, Y., Kordi, Y., Mishra, S., Liu, A., Smith, N. A., Khashabi, D., and Hajishirzi, H. Self-instruct: Aligning language models with self-generated instructions, 2023. URL https://arxiv.org/ abs/2212.10560 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 462,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 421.597, 506.616, 452.113 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Wei, J., Wang, X., Schuurmans, D., Bosma, M., Ichter, B., Xia, F., Chi, E., Le, Q., and Zhou, D. Chain-of-thought prompting elicits reasoning in large language models, 2023. URL https: //arxiv.org/abs/2201.11903 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 463,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 381.165, 507.664, 411.681 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Xu, C., Sun, Q., Zheng, K., Geng, X., Zhao, P., Feng, J., Tao, C., and Jiang, D. Wizardlm: Empowering large language models to follow complex instructions, 2023. URL https://arxiv. org/abs/2304.12244 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 464,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 329.824, 505.247, 371.249 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Zhang, Z., Rossi, R. A., Kveton, B., Shao, Y., Yang, D., Zamani, H., Dernoncourt, F., Barrow, J., Yu, T., Kim, S., Zhang, R., Gu, J., Derr, T., Chen, H., Wu, J., Chen, X., Wang, Z., Mitra, S., Lipka, N., Ahmed, N., and Wang, Y. Personalization of large language models: A survey, 2024. URL https://arxiv.org/abs/2411.00027 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 465,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 289.392, 505.247, 319.908 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Zheng, L., Chiang, W.-L., Sheng, Y., Zhuang, S., Wu, Z., Zhuang, Y., Lin, Z., Li, Z., Li, D., Xing, E. P., Zhang, H., Gonzalez, J. E., and Stoica, I. Judging llm-as-a-judge with mt-bench and chatbot arena, 2023. URL https://arxiv.org/abs/2306.05685 ."
+  }, {
+    "type" : "heading",
+    "id" : 466,
+    "level" : "Subtitle",
+    "page number" : 11,
+    "bounding box" : [ 108.0, 256.181, 247.278, 266.929 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "A Training data synthesis"
+  }, {
+    "type" : "paragraph",
+    "id" : 467,
+    "page number" : 11,
+    "bounding box" : [ 107.532, 179.075, 505.656, 242.172 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We introduce three key tasks with automated LLM evaluation to assess the personal model’s effectiveness in serving individuals: (1) memory-based multi-perspective Q&A, (2) context completion based on user needs, and (3) context critique incorporating user needs and external responses. To support these tasks, we design an LLM-driven automated data synthesis strategy that combines local and global perspective data generation, a multi-agent framework, and Chain-of-Thought (CoT) style synthesis."
+  }, {
+    "type" : "paragraph",
+    "id" : 468,
+    "page number" : 11,
+    "bounding box" : [ 108.0, 162.67, 454.618, 171.626 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Memory QA . Our training make use of the personal data under the following pipeline:"
+  }, {
+    "type" : "list",
+    "level" : "3",
+    "page number" : 11,
+    "bounding box" : [ 108.0, 69.201, 504.0, 157.569 ],
+    "numbering style" : "arabic numbers",
+    "number of list items" : 3,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 11,
+      "bounding box" : [ 108.0, 123.746, 504.0, 157.569 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "1. At stage 1, we categorized and summarize the uploaded multi-modal information, and make use of indexing and information extraction tools such as GraphRAG to find out useful entities, relations and communities.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 11,
+      "bounding box" : [ 108.0, 91.019, 504.0, 124.841 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "2. At stage 2, we generate user biography and status description according to the extracted information in the first level. At the same time, the entities, relations and communities will be ranked according to their type and frequency, their descriptions and related text units will also be saved.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 11,
+      "bounding box" : [ 108.0, 69.201, 503.999, 92.114 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "3. At stage 3, we generate trainable QA pairs given the data in stage 2 with corresponding context using data augmentation techniques, especially question generation and answering.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 472,
+    "page number" : 12,
+    "bounding box" : [ 108.0, 686.153, 504.001, 716.911 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Context Enhance . The data for the context enhancement task is derived from the entities extracted in the first phase of the memory QA task. This process is structured into several key steps to ensure the generation of realistic and diverse user queries."
+  }, {
+    "type" : "list",
+    "level" : "3",
+    "page number" : 12,
+    "bounding box" : [ 108.0, 559.941, 504.662, 681.036 ],
+    "numbering style" : "arabic numbers",
+    "number of list items" : 3,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 636.304, 504.662, 681.036 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "1. First, we simulate real-world scenarios by centering on these entities and incorporating a variety of expressions, such as imperative and interrogative forms, to create user queries(initial needs) that closely resemble actual usage. This approach ensures that the queries are not only relevant but also reflective of the diverse ways users might interact with the system.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 614.486, 504.165, 637.399 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "2. Next, we identify the related notes and to-do items for each user query. This step is crucial for grounding the queries in specific contexts, thereby enhancing their relevance and applicability.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 559.941, 504.002, 615.581 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "3. Finally, we input the user queries along with the associated notes and to-do items into a more advanced model, such as GPT-4 ( OpenAI et al. (2024)). The model is then tasked with enriching the user queries by adding details based on the related notes and to-do items. This step ensures that the queries are not only realistic but also detailed and contextually enriched, providing a robust foundation for further processing and analysis.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 476,
+    "page number" : 12,
+    "bounding box" : [ 108.0, 533.376, 505.241, 553.225 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Context Critic . The context critic task is regarded as the most challenging among our tasks, necessitating a more intricate data construction pipeline."
+  }, {
+    "type" : "list",
+    "level" : "3",
+    "page number" : 12,
+    "bounding box" : [ 108.0, 396.255, 504.348, 528.259 ],
+    "numbering style" : "arabic numbers",
+    "number of list items" : 3,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 494.436, 504.165, 528.259 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "1. Similar to the context enhancement task, the process begins with the creation of diverse and realistic initial needs(user query), followed by the retrieval of related notes and to-do items for each need.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 461.709, 504.346, 495.531 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "2. Subsequently, we employ a more advanced model to generate responses to these constructed needs, which serve as \"expert responses.\" This step ensures that the responses are of high quality and relevance, providing a solid basis for further critique.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 396.255, 504.348, 462.804 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "3. Finally, the user query, expert responses, and associated notes and to-do items are input into S ECOND M E . Our S ECOND M E is then tasked with representing the user and providing feedback on the expert responses, based on the related notes and to-do items. This feedback must thoroughly integrate the related notes and progressively evaluate whether the expert has fully addressed the initial needs. If not, the model should identify and articulate the deficiencies, ensuring a comprehensive and constructive critique.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "heading",
+    "id" : 480,
+    "level" : "Doctitle",
+    "page number" : 12,
+    "bounding box" : [ 108.0, 366.346, 258.014, 377.094 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "B Evaluation data synthesis"
+  }, {
+    "type" : "paragraph",
+    "id" : 481,
+    "page number" : 12,
+    "bounding box" : [ 107.691, 288.031, 505.243, 351.129 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The user upload data contains notes and todos. Notes can be a document, an audio file, a website, a picture or multi-modal information which includes title and content. And todos comes from user calendar or interaction within our App. Given the training objectives, we perform evaluation on seed users to test our model. Here, we only disclose the model test results of an internal staff member who has agreed to make their test results public. This user has 132 notes and 62 todos, and we got nearly 7k instruction pairs in total."
+  }, {
+    "type" : "paragraph",
+    "id" : 482,
+    "page number" : 12,
+    "bounding box" : [ 107.641, 217.097, 505.739, 280.195 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Similar to the synthesis of training data, the synthesis of test data also follows the process of question generation, Weak/Multi-step/Strong COT data synthesis and data filtering. In the query generation phase for test data, the Memory QA task utilizes subjective data while referring to the data synthesis process of objective data, generating 60 first-person and third-person perspective queries, respectively. At the same time, 60 context enhance and 60 context critic test samples are collected using the same pipeline in training data construction, isolated with the training set."
+  }, {
+    "type" : "heading",
+    "id" : 483,
+    "level" : "Subtitle",
+    "page number" : 12,
+    "bounding box" : [ 108.0, 186.456, 276.234, 197.204 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "C Details of Evaluation metrics"
+  }, {
+    "type" : "paragraph",
+    "id" : 484,
+    "page number" : 12,
+    "bounding box" : [ 108.0, 151.777, 503.996, 171.626 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Memory QA From the first-person perspective, we believe the ability of question answering can be reflected in the following metrics:"
+  }, {
+    "type" : "list",
+    "level" : "1",
+    "page number" : 12,
+    "bounding box" : [ 108.0, 69.201, 504.002, 147.019 ],
+    "numbering style" : "unordered",
+    "number of list items" : 4,
+    "list items" : [ {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 134.058, 432.591, 147.019 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Correctness : The response from LLM must not conflict with recorded content.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 112.837, 504.0, 136.109 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Helpfulness : The response from LLM needs to provide the user with incremental information value or decision-making value.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 91.019, 503.996, 114.291 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Completeness : When the user’s query can be addressed using reference information, the response should include detailed info and mention all relevant associated items that need to be covered.",
+      "kids" : [ ]
+    }, {
+      "type" : "list item",
+      "page number" : 12,
+      "bounding box" : [ 108.0, 69.201, 504.002, 92.473 ],
+      "font" : "NimbusRomNo9L-Regu",
+      "font size" : 9.963,
+      "text color" : "[0.0]",
+      "content" : "• Empathy : The response should incorporate the areas user values and is filled with empathy, aiming to help user if question allows.",
+      "kids" : [ ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 489,
+    "page number" : 13,
+    "bounding box" : [ 108.0, 697.062, 504.002, 716.911 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "From the third-person perspective, we replace Empathy with Role-correctness to represent if this LLM recognizes that the query is raised by another person or model, but not the user himself."
+  }, {
+    "type" : "paragraph",
+    "id" : 490,
+    "page number" : 13,
+    "bounding box" : [ 107.641, 658.856, 504.165, 689.226 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "At the same time, there are three levels of score in each metric: 0 represents that the answer of trained LLM does not meet the requirement of this metric under this query; 0.5 represents that the answer partially meets the requirement; 1 represents that the answer fully meets the requirement."
+  }, {
+    "type" : "paragraph",
+    "id" : 491,
+    "page number" : 13,
+    "bounding box" : [ 107.691, 631.558, 504.002, 651.019 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "To make the result table clearer and more readable, we will only provide the average ratings in the table of this section."
+  }, {
+    "type" : "paragraph",
+    "id" : 492,
+    "page number" : 13,
+    "bounding box" : [ 108.0, 542.433, 504.002, 616.828 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Context Enhance Given the original query, the enhanced query by the trained LLM and related memories recorded by the user, we set three levels of score to measure whether this enhanced query is good enough for the user: 0 represents that the enhanced query becomes the response to the original query, which has a problem with the role of response, or the enhanced query does not match the related memories at all; 0.5 represents that the enhanced query has the correct role, but the enhanced query is not close enough to the related memories; 1 represents that the enhanced query has the correct role and match the related memories perfectly."
+  }, {
+    "type" : "paragraph",
+    "id" : 493,
+    "page number" : 13,
+    "bounding box" : [ 108.0, 366.036, 505.241, 527.703 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Context Critic Given the original query, the response of expert model, the critic by the trained LLM and the related memories recorded by the user, we set five levels of score to measure whether this critic can represent user’s need: 0.0 represents that the critic completely fails to consider user’s perspective, lacking effective feedback or extension of the expert’s advice. The critic is entirely unrelated to user’s background, needs, or thoughts, and does not demonstrate an understanding or response to user’s personalized thinking; 0.25 represents that the critic partially aligns with user’s needs and background, but most of the time lacks personalized thinking or reaction. It might simply respond to the expert’s advice without demonstrating a deep understanding of the content or taking initiative in the conversation; 0.5 represents that the critic meets user’s basic needs and background, showing some feedback and reflection capabilities. However, the depth and interactivity are insufficient, failing to fully take the conversation to a deeper level; 0.75 represents that the critic demonstrates strong personalized thinking and feedback capabilities, effectively expanding on the expert’s advice, posing new questions or reflections, and presenting a smooth, logical tone; 1.0 represents that the critic fully meets user’s needs and background, accurately reflecting user’s personalized thinking. It deeply builds upon the expert’s advice, offering constructive feedback, questions, or viewpoints."
+  }, {
+    "type" : "heading",
+    "id" : 494,
+    "level" : "Doctitle",
+    "page number" : 13,
+    "bounding box" : [ 108.0, 336.652, 324.365, 347.4 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "D Details of our Multi-agent Framework"
+  }, {
+    "type" : "paragraph",
+    "id" : 495,
+    "page number" : 13,
+    "bounding box" : [ 108.0, 248.183, 505.24, 322.578 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Overview A multi-agent system in this framework has two layers of meaning. On the first level, for an individual user, the trained language model, acting as a personal assistant, collaborates with an expert model such as GPT-4o to help the user accomplish a specific task. The trained model enhances user queries, refines task instructions, and ensures that interactions with the expert model are efficient and contextually rich. This cooperation allows the user to receive high-quality assistance tailored to their needs while reducing the cognitive load of query formulation. The architecture can be shown as Figure 6"
+  }, {
+    "type" : "paragraph",
+    "id" : 496,
+    "page number" : 13,
+    "bounding box" : [ 108.0, 159.059, 504.245, 233.453 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Collaboration Between User’s Agents Within this framework, the trained model functions as an intermediary, bridging the gap between the user and expert models. When a user submits a complex request, the trained model expands the query by incorporating relevant details based on the user’s past interactions, preferences, and contextual knowledge. This enhanced query is then passed to the expert model, ensuring that the response is more precise and useful. Additionally, after receiving the expert model’s output, the trained model can further process and refine the information to align it more closely with the user’s expectations and communication style."
+  }, {
+    "type" : "paragraph",
+    "id" : 497,
+    "page number" : 13,
+    "bounding box" : [ 108.0, 69.934, 505.246, 144.329 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Interaction Among Multiple Users Beyond assisting an individual user, this system extends to interactions between multiple users, each with their own trained model. These models can communicate within a shared environment, facilitating knowledge exchange, collaboration, and even social interactions. This enables a new form of digital presence, where users can engage in discussions, share expertise, or collectively solve problems through their respective models. The trained models act as proxies, representing their users while maintaining their unique perspectives, thus fostering a more dynamic and interactive space for collective intelligence."
+  }, {
+    "type" : "image",
+    "page number" : 14,
+    "bounding box" : [ 147.599, 516.832, 464.386, 720.001 ],
+    "source" : "2503.08102_images/imageFile3.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 501,
+    "page number" : 14,
+    "bounding box" : [ 349.667, 694.0, 411.333, 709.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Multiple User"
+  }, {
+    "type" : "paragraph",
+    "id" : 499,
+    "page number" : 14,
+    "bounding box" : [ 160.667, 698.667, 222.667, 708.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "For One User"
+  }, {
+    "type" : "paragraph",
+    "id" : 500,
+    "page number" : 14,
+    "bounding box" : [ 332.0, 698.0, 348.667, 707.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "For"
+  }, {
+    "type" : "paragraph",
+    "id" : 504,
+    "page number" : 14,
+    "bounding box" : [ 411.333, 668.333, 435.0, 679.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "User"
+  }, {
+    "type" : "paragraph",
+    "id" : 503,
+    "page number" : 14,
+    "bounding box" : [ 314.0, 667.667, 337.0, 678.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "User"
+  }, {
+    "type" : "paragraph",
+    "id" : 502,
+    "page number" : 14,
+    "bounding box" : [ 178.0, 665.333, 200.667, 674.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "User"
+  }, {
+    "type" : "paragraph",
+    "id" : 507,
+    "page number" : 14,
+    "bounding box" : [ 406.333, 620.667, 439.333, 631.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Second"
+  }, {
+    "type" : "paragraph",
+    "id" : 506,
+    "page number" : 14,
+    "bounding box" : [ 309.0, 619.667, 342.667, 630.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Second"
+  }, {
+    "type" : "paragraph",
+    "id" : 505,
+    "page number" : 14,
+    "bounding box" : [ 172.333, 617.0, 206.0, 627.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Second"
+  }, {
+    "type" : "paragraph",
+    "id" : 510,
+    "page number" : 14,
+    "bounding box" : [ 416.667, 609.333, 430.0, 618.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Me"
+  }, {
+    "type" : "paragraph",
+    "id" : 509,
+    "page number" : 14,
+    "bounding box" : [ 319.333, 608.667, 332.667, 617.333 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Me"
+  }, {
+    "type" : "paragraph",
+    "id" : 508,
+    "page number" : 14,
+    "bounding box" : [ 182.667, 604.667, 196.667, 614.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Me"
+  }, {
+    "type" : "paragraph",
+    "id" : 513,
+    "page number" : 14,
+    "bounding box" : [ 406.667, 548.667, 441.0, 562.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Expert"
+  }, {
+    "type" : "paragraph",
+    "id" : 512,
+    "page number" : 14,
+    "bounding box" : [ 311.0, 549.0, 345.0, 561.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Expert"
+  }, {
+    "type" : "paragraph",
+    "id" : 511,
+    "page number" : 14,
+    "bounding box" : [ 172.333, 547.667, 206.333, 559.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Expert"
+  }, {
+    "type" : "paragraph",
+    "id" : 515,
+    "page number" : 14,
+    "bounding box" : [ 309.333, 539.333, 346.0, 550.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Model 4"
+  }, {
+    "type" : "paragraph",
+    "id" : 516,
+    "page number" : 14,
+    "bounding box" : [ 405.333, 539.333, 442.667, 550.0 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Model B"
+  }, {
+    "type" : "paragraph",
+    "id" : 514,
+    "page number" : 14,
+    "bounding box" : [ 176.0, 538.0, 204.0, 548.667 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Model"
+  }, {
+    "type" : "paragraph",
+    "id" : 517,
+    "page number" : 14,
+    "bounding box" : [ 108.0, 489.246, 503.997, 508.708 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Figure 6: Multi-agent architecture, the arrows represent possible communications. We exclude the arrows between user and expert model for clarity."
+  }, {
+    "type" : "paragraph",
+    "id" : 518,
+    "page number" : 14,
+    "bounding box" : [ 107.641, 401.54, 505.248, 465.026 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Applications and Implications This multi-agent framework has applications in various fields, including collaborative research, technical support, and online social interactions. It enhances productivity by optimizing human-model collaboration while also enabling richer, more meaningful exchanges between users through their digital counterparts. The ability of trained models to interact with both expert systems and other user models creates a more interconnected and intelligent digital ecosystem, ultimately improving the efficiency and depth of knowledge-sharing processes."
+  } ]
+}

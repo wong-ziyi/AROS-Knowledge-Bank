@@ -1,0 +1,52 @@
+site_name: AROS Knowledge Bank
+site_description: Foundational literature and project codebases for the Antigravity Research OS
+site_url: https://wong-ziyi.github.io/AROS-Knowledge-Bank/
+repo_url: https://github.com/wong-ziyi/AROS-Knowledge-Bank
+repo_name: AROS-Knowledge-Bank
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Agent Discovery: AGENT_DISCOVERY.md
+  - Literature:
+    - Overview: literature/index.md
+  - Projects:
+    - Overview: projects/index.md

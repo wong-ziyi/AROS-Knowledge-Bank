@@ -1,0 +1,4540 @@
+{
+  "file name" : "memgpt_paper.pdf",
+  "number of pages" : 13,
+  "author" : "Charles Packer, Sarah Wooders, Kevin Lin, Vivian Fang, Shishir G. Patil, Ion Stoica, Joseph E. Gonzalez",
+  "title" : "MemGPT: Towards LLMs as Operating Systems",
+  "creation date" : "D:20240213024106Z",
+  "modification date" : "D:20240213024106Z",
+  "kids" : [ {
+    "type" : "heading",
+    "id" : 410,
+    "level" : "Doctitle",
+    "page number" : 1,
+    "bounding box" : [ 148.345, 688.079, 448.539, 700.976 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 14.346,
+    "text color" : "[0.0]",
+    "content" : "MemGPT: Towards LLMs as Operating Systems"
+  }, {
+    "type" : "paragraph",
+    "id" : 411,
+    "page number" : 1,
+    "bounding box" : [ 156.053, 627.313, 439.167, 649.505 ],
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Charles Packer 1 Sarah Wooders 1 Kevin Lin 1 Vivian Fang 1 Shishir G. Patil 1 Ion Stoica 1 Joseph E. Gonzalez 1"
+  }, {
+    "type" : "heading",
+    "id" : 412,
+    "level" : "Subtitle",
+    "page number" : 1,
+    "bounding box" : [ 150.198, 592.309, 194.683, 603.057 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "Abstract"
+  }, {
+    "type" : "paragraph",
+    "id" : 413,
+    "page number" : 1,
+    "bounding box" : [ 75.366, 275.96, 269.517, 583.391 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Large language models (LLMs) have revolutionized AI, but are constrained by limited context windows, hindering their utility in tasks like extended conversations and document analysis. To enable using context beyond limited context windows, we propose virtual context management , a technique drawing inspiration from hierarchical memory systems in traditional operating systems which provide the illusion of an extended virtual memory via paging between physical memory and disk. Using this technique, we introduce MemGPT (MemoryGPT), a system that intelligently manages different storage tiers in order to effectively provide extended context within the LLM’s limited context window. We evaluate our OS-inspired design in two domains where the limited context windows of modern LLMs severely handicaps their performance: document analysis, where MemGPT is able to analyze large documents that far exceed the underlying LLM’s context window, and multi-session chat, where MemGPT can create conversational agents that remember, reflect, and evolve dynamically through long-term interactions with their users. We release MemGPT code and data for our experiments at https://research.memgpt.ai."
+  }, {
+    "type" : "heading",
+    "id" : 416,
+    "level" : "Subtitle",
+    "page number" : 1,
+    "bounding box" : [ 55.44, 238.351, 132.276, 249.099 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "1. Introduction"
+  }, {
+    "type" : "paragraph",
+    "id" : 418,
+    "page number" : 1,
+    "bounding box" : [ 55.44, 123.77, 289.442, 227.963 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In recent years, large language models (LLMs) and their underlying transformer architecture (Vaswani et al., 2017; Devlin et al., 2018; Brown et al., 2020; Ouyang et al., 2022) have become the cornerstone of conversational AI and have led to a wide array of consumer and enterprise applications. Despite these advances, the limited fixed-length context windows used by LLMs significantly hinders their applicability to long conversations or reasoning about long documents. For example, the most widely used open-source"
+  }, {
+    "type" : "paragraph",
+    "id" : 420,
+    "page number" : 1,
+    "bounding box" : [ 55.44, 95.005, 289.438, 114.527 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "1 University of California, Berkeley. Correspondence to: Charles Packer < cpacker@berkeley.edu > ."
+  }, {
+    "type" : "paragraph",
+    "id" : 414,
+    "page number" : 1,
+    "bounding box" : [ 307.44, 395.482, 541.442, 559.451 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Directly extending the context length of transformers incurs a quadratic increase in computational time and memory cost due to the transformer architecture’s self-attention mechanism, making the design of new long-context architectures a pressing research challenge (Dai et al., 2019; Kitaev et al., 2020; Beltagy et al., 2020). While developing longer models is an active area of research (Dong et al., 2023), even if we could overcome the computational challenges of context scaling, recent research shows that longcontext models struggle to utilize additional context effectively (Liu et al., 2023a). As consequence, given the considerable resources needed to train state-of-the-art LLMs and diminishing returns of context scaling, there is a critical need for alternative techniques to support long context."
+  }, {
+    "type" : "paragraph",
+    "id" : 415,
+    "page number" : 1,
+    "bounding box" : [ 307.44, 246.042, 541.442, 386.101 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In this paper, we study how to provide the illusion of an infinite context while continuing to use fixed-context models. Our approach borrows from the idea of virtual memory paging that was developed to enable applications to work on datasets that far exceed the available memory by paging data between main memory and disk. We leverage the recent progress in function calling abilities of LLM agents (Schick et al., 2023; Liu et al., 2023b) to design MemGPT, an OS-inspired LLM system for virtual context management . Using function calls, LLM agents can read and write to external data sources, modify their own context, and choose when to return responses to the user."
+  }, {
+    "type" : "paragraph",
+    "id" : 417,
+    "page number" : 1,
+    "bounding box" : [ 307.44, 132.468, 541.444, 236.662 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "These capabilities allow LLMs to effective “page” in and out information between context windows (analogous to “main memory” in operating systems) and external storage, similar to hierarchical memory in traditional OSes. In addition, function calls can be leveraged to manage control flow between context management, response generation, and user interactions. This allows for an agent to choose to iteratively modify what is in its context for a single task, thereby more effectively utilizing its limited context."
+  }, {
+    "type" : "paragraph",
+    "id" : 419,
+    "page number" : 1,
+    "bounding box" : [ 307.44, 78.67, 541.442, 123.087 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "In MemGPT, we treat context windows as a constrained memory resource, and design a memory hiearchy for LLMs analogous to memory tiers used in traditional OSes (Patterson et al., 1988). Applications in traditional OSes interact with virtual memory , which provides an illusion of there being more memory resources than are actually available in physical (i.e., main) memory by the OS paging overflow data to disk and retrieving data (via a page fault) back into memory when accessed by applications. To provide a similar illusion of longer context length (analogous to virtual memory), we allow the LLM to manage what is placed in its own context (analogous to physical memory) via an 'LLM OS', which we call MemGPT. MemGPT enables the LLM to retrieve relevant historical data missing from what is placed in-context, and also evict less relevant data from context and into external storage systems. Figure 3 illustrates the components of MemGPT."
+  }, {
+    "type" : "image",
+    "id" : 421,
+    "page number" : 2,
+    "bounding box" : [ 62.518, 596.803, 280.676, 725.157 ],
+    "source" : "memgpt_paper_images/imageFile1.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 422,
+    "page number" : 2,
+    "bounding box" : [ 170.123, 716.984, 200.883, 723.959 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 5.763,
+    "text color" : "[0.30980393290519714, 0.30980393290519714, 0.30980393290519714]",
+    "content" : "February 7 February"
+  }, {
+    "type" : "paragraph",
+    "id" : 423,
+    "page number" : 2,
+    "bounding box" : [ 188.554, 716.342, 219.849, 723.438 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "February 7"
+  }, {
+    "type" : "paragraph",
+    "id" : 426,
+    "page number" : 2,
+    "bounding box" : [ 78.809, 697.383, 161.084, 705.521 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.723,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "How was your day today? How was your day"
+  }, {
+    "type" : "paragraph",
+    "id" : 427,
+    "page number" : 2,
+    "bounding box" : [ 95.65, 696.401, 179.357, 704.68 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "How was your day today?"
+  }, {
+    "type" : "paragraph",
+    "id" : 433,
+    "page number" : 2,
+    "bounding box" : [ 113.174, 677.188, 250.678, 685.325 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.723,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "fun my bf james baked me a birthday cake fun my bf james baked me a birthday"
+  }, {
+    "type" : "paragraph",
+    "id" : 434,
+    "page number" : 2,
+    "bounding box" : [ 130.614, 675.854, 270.511, 684.133 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "fun my bf james baked me a birthday cake"
+  }, {
+    "type" : "paragraph",
+    "id" : 437,
+    "page number" : 2,
+    "bounding box" : [ 78.597, 657.374, 161.562, 665.511 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Oh wow, happy birthday!"
+  }, {
+    "type" : "paragraph",
+    "id" : 439,
+    "page number" : 2,
+    "bounding box" : [ 161.56, 657.459, 171.126, 665.455 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "\uD83C\uDF82"
+  }, {
+    "type" : "paragraph",
+    "id" : 438,
+    "page number" : 2,
+    "bounding box" : [ 95.435, 655.695, 179.844, 663.973 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Oh wow, happy birthday!"
+  }, {
+    "type" : "paragraph",
+    "id" : 440,
+    "page number" : 2,
+    "bounding box" : [ 179.841, 655.782, 189.574, 663.917 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "\uD83C\uDF82"
+  }, {
+    "type" : "paragraph",
+    "id" : 445,
+    "page number" : 2,
+    "bounding box" : [ 72.809, 644.758, 166.438, 651.733 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 5.763,
+    "text color" : "[0.8901960849761963, 0.003921568859368563, 0.003921568859368563]",
+    "content" : "System Alert: Memory Pressure System Alert: Memory"
+  }, {
+    "type" : "paragraph",
+    "id" : 447,
+    "page number" : 2,
+    "bounding box" : [ 89.546, 642.859, 184.804, 649.956 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "System Alert: Memory Pressure"
+  }, {
+    "type" : "paragraph",
+    "id" : 454,
+    "page number" : 2,
+    "bounding box" : [ 75.722, 624.361, 269.27, 632.239 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "working_context.append('Birthday is February 7')"
+  }, {
+    "type" : "paragraph",
+    "id" : 458,
+    "page number" : 2,
+    "bounding box" : [ 92.511, 622.108, 289.426, 630.122 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "working_context.append('Birthday is February 7')"
+  }, {
+    "type" : "paragraph",
+    "id" : 464,
+    "page number" : 2,
+    "bounding box" : [ 75.722, 601.311, 265.238, 609.188 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "working_context.append('Boyfriend named James')"
+  }, {
+    "type" : "paragraph",
+    "id" : 466,
+    "page number" : 2,
+    "bounding box" : [ 92.511, 598.656, 285.323, 606.671 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "working_context.append('Boyfriend named James')"
+  }, {
+    "type" : "paragraph",
+    "id" : 469,
+    "page number" : 2,
+    "bounding box" : [ 55.44, 569.642, 289.445, 588.298 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Figure 1. MemGPT (left) writes data to persistent memory after it receives a system alert about limited context space."
+  }, {
+    "type" : "paragraph",
+    "id" : 425,
+    "page number" : 2,
+    "bounding box" : [ 413.007, 716.342, 444.302, 723.438 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 5.863,
+    "text color" : "[0.30980393290519714, 0.30980393290519714, 0.30980393290519714]",
+    "content" : "7 February 7"
+  }, {
+    "type" : "image",
+    "id" : 424,
+    "page number" : 2,
+    "bounding box" : [ 316.126, 589.675, 532.404, 719.065 ],
+    "source" : "memgpt_paper_images/imageFile2.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 428,
+    "page number" : 2,
+    "bounding box" : [ 309.883, 697.182, 480.894, 705.319 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.723,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "Did you do anything else to celebrate your birthday? \uD83D\uDE0A Did you do anything else to celebrate your"
+  }, {
+    "type" : "paragraph",
+    "id" : 430,
+    "page number" : 2,
+    "bounding box" : [ 480.963, 697.268, 490.529, 705.263 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "\uD83D\uDE0A"
+  }, {
+    "type" : "paragraph",
+    "id" : 429,
+    "page number" : 2,
+    "bounding box" : [ 330.745, 696.195, 504.732, 704.474 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Did you do anything else to celebrate your birthday?"
+  }, {
+    "type" : "paragraph",
+    "id" : 431,
+    "page number" : 2,
+    "bounding box" : [ 504.802, 696.283, 514.534, 704.418 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "\uD83D\uDE0A"
+  }, {
+    "type" : "paragraph",
+    "id" : 435,
+    "page number" : 2,
+    "bounding box" : [ 412.146, 677.188, 494.751, 685.325 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.723,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "yeah we went to six ﬂags! yeah we went to six"
+  }, {
+    "type" : "paragraph",
+    "id" : 436,
+    "page number" : 2,
+    "bounding box" : [ 434.788, 675.854, 518.83, 684.133 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "yeah we went to six flags!"
+  }, {
+    "type" : "paragraph",
+    "id" : 441,
+    "page number" : 2,
+    "bounding box" : [ 307.727, 657.246, 444.824, 665.123 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "recall_storage.search('six flags')"
+  }, {
+    "type" : "paragraph",
+    "id" : 442,
+    "page number" : 2,
+    "bounding box" : [ 328.552, 655.565, 468.034, 663.579 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "recall_storage.search('six flags')"
+  }, {
+    "type" : "paragraph",
+    "id" : 449,
+    "page number" : 2,
+    "bounding box" : [ 320.275, 638.591, 410.014, 645.566 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Showing 3 of 3 results (page 1/1):"
+  }, {
+    "type" : "paragraph",
+    "id" : 450,
+    "page number" : 2,
+    "bounding box" : [ 341.318, 636.585, 432.619, 643.681 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Showing 3 of 3 results (page 1/1):"
+  }, {
+    "type" : "paragraph",
+    "id" : 453,
+    "page number" : 2,
+    "bounding box" : [ 320.275, 631.388, 410.921, 638.362 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 5.763,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "[01/14/2024] “i love six ﬂags been"
+  }, {
+    "type" : "paragraph",
+    "id" : 455,
+    "page number" : 2,
+    "bounding box" : [ 341.318, 629.256, 433.541, 636.353 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "[01/24/2024] 'lol yeah six flags',"
+  }, {
+    "type" : "paragraph",
+    "id" : 459,
+    "page number" : 2,
+    "bounding box" : [ 320.275, 624.184, 458.217, 631.159 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "[01/14/2024] 'i love six flags been like 100 times',"
+  }, {
+    "type" : "paragraph",
+    "id" : 460,
+    "page number" : 2,
+    "bounding box" : [ 341.318, 621.928, 481.66, 629.024 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "[01/14/2024] 'i love six flags been like 100 times',"
+  }, {
+    "type" : "paragraph",
+    "id" : 461,
+    "page number" : 2,
+    "bounding box" : [ 320.275, 616.981, 473.952, 623.956 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "[10/12/2023] 'james and I actually first met at six flags'"
+  }, {
+    "type" : "paragraph",
+    "id" : 462,
+    "page number" : 2,
+    "bounding box" : [ 341.318, 614.6, 497.669, 621.696 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "[10/12/2023] 'james and I actually first met at six flags'"
+  }, {
+    "type" : "paragraph",
+    "id" : 467,
+    "page number" : 2,
+    "bounding box" : [ 308.436, 593.658, 487.326, 601.795 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.723,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "Did you go with James? It’s so cute how both met there! Did you go with James? It’s so cute how both met"
+  }, {
+    "type" : "paragraph",
+    "id" : 468,
+    "page number" : 2,
+    "bounding box" : [ 329.273, 590.871, 511.276, 599.149 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Did you go with James? It's so cute how both met there!"
+  }, {
+    "type" : "paragraph",
+    "id" : 432,
+    "page number" : 2,
+    "bounding box" : [ 566.851, 699.011, 609.73, 707.29 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "How's James"
+  }, {
+    "type" : "paragraph",
+    "id" : 443,
+    "page number" : 2,
+    "bounding box" : [ 541.686, 656.303, 610.26, 664.181 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "working_context.r"
+  }, {
+    "type" : "paragraph",
+    "id" : 444,
+    "page number" : 2,
+    "bounding box" : [ 566.582, 654.606, 611.725, 662.62 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "working_con"
+  }, {
+    "type" : "paragraph",
+    "id" : 446,
+    "page number" : 2,
+    "bounding box" : [ 541.686, 648.38, 610.241, 656.258 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Boyfriend name"
+  }, {
+    "type" : "paragraph",
+    "id" : 448,
+    "page number" : 2,
+    "bounding box" : [ 566.582, 646.545, 611.72, 654.559 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Boyfrien"
+  }, {
+    "type" : "paragraph",
+    "id" : 451,
+    "page number" : 2,
+    "bounding box" : [ 541.686, 640.457, 610.237, 648.334 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Ex-boyfriend n"
+  }, {
+    "type" : "paragraph",
+    "id" : 452,
+    "page number" : 2,
+    "bounding box" : [ 566.582, 638.483, 611.72, 646.498 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Ex-boyfr"
+  }, {
+    "type" : "paragraph",
+    "id" : 456,
+    "page number" : 2,
+    "bounding box" : [ 541.686, 632.533, 545.72, 640.411 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : ")"
+  }, {
+    "type" : "paragraph",
+    "id" : 457,
+    "page number" : 2,
+    "bounding box" : [ 566.582, 630.422, 570.686, 638.437 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : ")"
+  }, {
+    "type" : "paragraph",
+    "id" : 463,
+    "page number" : 2,
+    "bounding box" : [ 543.315, 607.547, 610.806, 615.684 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.723,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "Sorry to hear that hope Sorry to hear"
+  }, {
+    "type" : "paragraph",
+    "id" : 465,
+    "page number" : 2,
+    "bounding box" : [ 568.238, 605.001, 611.343, 613.28 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Sorry to hear"
+  }, {
+    "type" : "paragraph",
+    "id" : 470,
+    "page number" : 2,
+    "bounding box" : [ 307.44, 562.465, 541.439, 581.121 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Figure 2. MemGPT (left) can search out-of-context data to bring relevant information into the current context window."
+  }, {
+    "type" : "paragraph",
+    "id" : 474,
+    "page number" : 2,
+    "bounding box" : [ 55.44, 218.452, 289.442, 382.422 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The combined use of a memory-hierarchy, OS functions and event-based control flow allow MemGPT to handle unbounded context using LLMs that have finite context windows. To demonstrate the utility of our new OSinspired LLM system, we evaluate MemGPT on two domains where the performance of existing LLMs is severely limited by finite context: document analysis, where the length of standard text files can quickly exceed the input capacity of modern LLMs, and conversational agents, where LLMs bound by limited conversation windows lack context awareness, persona consistency, and long-term memory during extended conversations. In both settings, MemGPT is able to overcome the limitations of finite context to outperform existing LLM-based approaches."
+  }, {
+    "type" : "heading",
+    "id" : 476,
+    "level" : "Subtitle",
+    "page number" : 2,
+    "bounding box" : [ 55.44, 189.455, 197.874, 200.203 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "2. MemGPT (MemoryGPT)"
+  }, {
+    "type" : "paragraph",
+    "id" : 478,
+    "page number" : 2,
+    "bounding box" : [ 55.44, 74.873, 289.443, 179.067 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "MemGPT’s OS-inspired multi-level memory architecture delineates between two primary memory types: main context (analogous to main memory/physical memory/RAM) and external context (analogous to disk memory/disk storage). Main context consists of the LLM prompt tokens anything in main context is considered in-context and can be accessed by the LLM processor during inference. External context refers to any information that is held outside of the LLMs fixed context window. This out-of-context data"
+  }, {
+    "type" : "paragraph",
+    "id" : 471,
+    "page number" : 2,
+    "bounding box" : [ 307.44, 485.234, 541.442, 529.651 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "must always be explicitly moved into main context in order for it to be passed to the LLM processor during inference. MemGPT provides function calls that the LLM processor to manage its own memory without any user intervention."
+  }, {
+    "type" : "heading",
+    "id" : 472,
+    "level" : "Subtitle",
+    "page number" : 2,
+    "bounding box" : [ 307.44, 460.085, 448.271, 469.041 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "2.1. Main context ( prompt tokens )"
+  }, {
+    "type" : "paragraph",
+    "id" : 473,
+    "page number" : 2,
+    "bounding box" : [ 307.44, 226.255, 541.442, 450.0 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The prompt tokens in MemGPT are split into three contiguous sections: the system instructions , working context , and FIFO Queue . The system instructions are readonly (static) and contain information on the MemGPT control flow, the intended usage of the different memory levels, and instructions on how to use the MemGPT functions (e.g. how to retrieve out-of-context data). Working context is a fixed-size read/write block of unstructured text, writeable only via MemGPT function calls. In conversational settings, working context is intended to be used to store key facts, preferences, and other important information about the user and the persona the agent is adopting, allowing the agent to converse fluently with the user. The FIFO queue stores a rolling history of messages, including messages between the agent and user, as well as system messages (e.g. memory warnings) and function call inputs and outputs. The first index in the FIFO queue stores a system message containing a recursive summary of messages that have been evicted from the queue."
+  }, {
+    "type" : "heading",
+    "id" : 475,
+    "level" : "Subtitle",
+    "page number" : 2,
+    "bounding box" : [ 307.44, 201.106, 393.776, 210.062 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "2.2. Queue Manager"
+  }, {
+    "type" : "paragraph",
+    "id" : 477,
+    "page number" : 2,
+    "bounding box" : [ 307.44, 74.873, 541.442, 191.41 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The queue manager manages messages in recall storage and the FIFO queue . When a new message is received by the system, the queue manager appends the incoming messages to the FIFO queue, concatenates the prompt tokens and triggers the LLM inference to generate LLM output (the completion tokens). The queue manager writes both the incoming message and the generated LLM output to recall storage (the MemGPT message database). When messages in recall storage are retrieved via a MemGPT function call, the queue manager appends them to the back of"
+  }, {
+    "type" : "heading",
+    "id" : 479,
+    "level" : "Subtitle",
+    "page number" : 3,
+    "bounding box" : [ 208.766, 713.176, 385.182, 721.808 ],
+    "heading level" : 1,
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "LLM Finite Context Window (e.g. 8k tokens)"
+  }, {
+    "type" : "image",
+    "id" : 480,
+    "page number" : 3,
+    "bounding box" : [ 83.676, 562.543, 512.229, 707.621 ],
+    "source" : "memgpt_paper_images/imageFile3.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 481,
+    "page number" : 3,
+    "bounding box" : [ 225.925, 686.285, 272.801, 693.19 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Prompt Tokens"
+  }, {
+    "type" : "paragraph",
+    "id" : 482,
+    "page number" : 3,
+    "bounding box" : [ 434.639, 686.285, 495.33, 693.19 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Completion Tokens"
+  }, {
+    "type" : "paragraph",
+    "id" : 483,
+    "page number" : 3,
+    "bounding box" : [ 101.626, 659.949, 183.91, 668.581 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "System Instructions"
+  }, {
+    "type" : "paragraph",
+    "id" : 484,
+    "page number" : 3,
+    "bounding box" : [ 213.43, 659.949, 285.263, 668.581 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "Working Context"
+  }, {
+    "type" : "paragraph",
+    "id" : 485,
+    "page number" : 3,
+    "bounding box" : [ 328.217, 659.949, 380.829, 668.581 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "FIFO Queue"
+  }, {
+    "type" : "paragraph",
+    "id" : 486,
+    "page number" : 3,
+    "bounding box" : [ 437.728, 659.949, 496.809, 668.581 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Output Buﬀer"
+  }, {
+    "type" : "paragraph",
+    "id" : 489,
+    "page number" : 3,
+    "bounding box" : [ 336.407, 640.032, 372.653, 646.938 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Read-Write"
+  }, {
+    "type" : "paragraph",
+    "id" : 487,
+    "page number" : 3,
+    "bounding box" : [ 113.973, 639.665, 171.586, 646.571 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Read-Only (static)"
+  }, {
+    "type" : "paragraph",
+    "id" : 488,
+    "page number" : 3,
+    "bounding box" : [ 231.226, 639.665, 267.473, 646.571 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Read-Write"
+  }, {
+    "type" : "paragraph",
+    "id" : 492,
+    "page number" : 3,
+    "bounding box" : [ 311.07, 630.709, 398.039, 637.614 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Write via Queue Manager"
+  }, {
+    "type" : "paragraph",
+    "id" : 490,
+    "page number" : 3,
+    "bounding box" : [ 99.705, 630.341, 185.881, 637.247 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "MemGPT System Prompt"
+  }, {
+    "type" : "paragraph",
+    "id" : 491,
+    "page number" : 3,
+    "bounding box" : [ 216.342, 630.341, 282.386, 637.247 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Write via Functions"
+  }, {
+    "type" : "paragraph",
+    "id" : 494,
+    "page number" : 3,
+    "bounding box" : [ 209.44, 593.846, 286.868, 602.477 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Function Executor"
+  }, {
+    "type" : "paragraph",
+    "id" : 495,
+    "page number" : 3,
+    "bounding box" : [ 320.94, 593.846, 388.111, 602.477 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Queue Manager"
+  }, {
+    "type" : "paragraph",
+    "id" : 493,
+    "page number" : 3,
+    "bounding box" : [ 102.966, 591.356, 173.071, 599.988 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "Archival Storage"
+  }, {
+    "type" : "paragraph",
+    "id" : 496,
+    "page number" : 3,
+    "bounding box" : [ 428.441, 591.355, 488.59, 599.987 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 9.712,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "Recall Storage"
+  }, {
+    "type" : "paragraph",
+    "id" : 497,
+    "page number" : 3,
+    "bounding box" : [ 106.08, 572.549, 169.972, 579.455 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Read via Functions"
+  }, {
+    "type" : "paragraph",
+    "id" : 498,
+    "page number" : 3,
+    "bounding box" : [ 426.589, 572.549, 490.481, 579.455 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Read via Functions"
+  }, {
+    "type" : "paragraph",
+    "id" : 499,
+    "page number" : 3,
+    "bounding box" : [ 105.005, 563.08, 171.049, 569.985 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Write via Functions"
+  }, {
+    "type" : "paragraph",
+    "id" : 500,
+    "page number" : 3,
+    "bounding box" : [ 415.062, 563.08, 502.03, 569.985 ],
+    "font" : "font000000002b6d07c5",
+    "font size" : 7.77,
+    "text color" : "[0.0, 0.0, 0.0]",
+    "content" : "Write via Queue Manager"
+  }, {
+    "type" : "paragraph",
+    "id" : 501,
+    "page number" : 3,
+    "bounding box" : [ 55.44, 478.45, 541.446, 540.942 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Figure 3. In MemGPT, a fixed-context LLM processor is augmented with a hierarchical memory system and functions that let it manage its own memory. The LLM’s prompt tokens (inputs), or main context , consist of the system instructions, working context, and a FIFO queue. The LLM completion tokens (outputs) are interpreted as function calls by the function executor. MemGPT uses functions to move data between main context and external context (the archival and recall storage databases). The LLM can request immediate follow-up LLM inference to chain function calls together by generating a special keyword argument ( request heartbeat=true ) in its output; function chaining is what allows MemGPT to perform multi-step retrieval to answer user queries."
+  }, {
+    "type" : "paragraph",
+    "id" : 502,
+    "page number" : 3,
+    "bounding box" : [ 55.44, 446.415, 289.442, 454.967 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "the queue to reinsert them into the LLM’s context window."
+  }, {
+    "type" : "paragraph",
+    "id" : 503,
+    "page number" : 3,
+    "bounding box" : [ 55.44, 201.334, 289.443, 437.034 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The queue manager is also responsible for controlling context overflow via a queue eviction policy. When the prompt tokens exceed the ‘warning token count‘ of the underlying LLM’s context window (e.g. 70% of the context window), the queue manager inserts a system message into the queue warning the LLM of an impending queue eviction (a ‘memory pressure‘ warning) to allow the LLM to use MemGPT functions to store important information contained in the FIFO queue to working context or archival storage (a read/write database storing arbitrary length text objects). When the prompt tokens exceed the ‘flush token count’ (e.g. 100% of the context window), the queue manager flushes the queue to free up space in the context window: the queue manager evicts a specific count of messages (e.g. 50% of the context window), generates a new recursive summary using the existing recursive summary and evicted messages. Once the queue is flushed, the evicted messages are no longer in-context and immediately viewable to the LLM, however they are stored indefinitely in recall storage and readable via MemGPT function calls."
+  }, {
+    "type" : "heading",
+    "id" : 505,
+    "level" : "Subtitle",
+    "page number" : 3,
+    "bounding box" : [ 55.44, 176.185, 284.29, 185.141 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "2.3. Function executor (handling of completion tokens )"
+  }, {
+    "type" : "paragraph",
+    "id" : 506,
+    "page number" : 3,
+    "bounding box" : [ 55.44, 85.817, 289.442, 166.101 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "MemGPT orchestrates data movement between main context and external context via function calls that are generated by the LLM processor. Memory edits and retrieval are entirely self-directed: MemGPT autonomously updates and searches through its own memory based on the current context. For instance, it can decide when to move items between contexts (e.g. when the conversation his- tory is becoming too long, as show in Figure 1) and modify its main context to better reflect its evolving understanding of its current objectives and responsibilities (as shown in Figure 3). We implement self-directed editing and retrieval by providing explicit instructions within the system instructions that guide the LLM on how to interact with the MemGPT memory systems. These instructions comprise two main components: (1) a detailed description of the memory hierarchy and their respective utilities, and (2) a function schema (complete with their natural language descriptions) that the system can call to access or modify its memory."
+  }, {
+    "type" : "paragraph",
+    "id" : 504,
+    "page number" : 3,
+    "bounding box" : [ 307.44, 105.692, 541.442, 305.527 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "During each inference cycle, LLM processor takes main context (concatenated into a single string) as input, and generates an output string. This output string is parsed by MemGPT to ensure correctness, and if the parser validates the function arguments the function is executed. The results, including any runtime errors that occur (e.g. trying to add to main context when it is already at maximum capacity), are then fed back to the processor by MemGPT. This feedback loop enables the system to learn from its actions and adjust its behavior accordingly. Awareness of context limits is a key aspect in making the self-editing mechanism work effectively, to this end MemGPT prompts the processor with warnings regarding token limitations to guide its memory management decisions. Additionally, our memory retrieval mechanisms are designed to be cognizant of these token constraints and implement pagination to prevent retrieval calls from overflowing the context window."
+  }, {
+    "type" : "paragraph",
+    "id" : 512,
+    "page number" : 4,
+    "bounding box" : [ 2.001, 675.007, 31.061, 683.342 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.886,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "birthday cake"
+  }, {
+    "type" : "paragraph",
+    "id" : 520,
+    "page number" : 4,
+    "bounding box" : [ 0.559, 620.896, 50.104, 628.965 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.886,
+    "text color" : "[0.0, 1.0, 0.0]",
+    "content" : "February 7 ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 523,
+    "page number" : 4,
+    "bounding box" : [ 0.559, 597.285, 45.974, 605.354 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.886,
+    "text color" : "[0.0, 1.0, 0.0]",
+    "content" : "named James ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 507,
+    "page number" : 4,
+    "bounding box" : [ 174.524, 715.77, 206.032, 722.914 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "February 7"
+  }, {
+    "type" : "paragraph",
+    "id" : 510,
+    "page number" : 4,
+    "bounding box" : [ 55.44, 663.166, 289.445, 714.699 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Table 1. Comparing context commonly used models and LLM APIs (data collected 1/2024). *Approximate message count assuming a preprompt of 1k tokens, and an average message size of ∼ 50 tokens ( ∼ 250 characters). ‘Open’ means the model is open-source or open-weights (vs only available behind an API). yeah we went to six ﬂags! Did you do anything else to celebrate your birthday? \uD83D\uDE0A recall_storage.search(“ six flags ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 514,
+    "page number" : 4,
+    "bounding box" : [ 89.496, 654.58, 229.925, 662.649 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "recall_storage.search('six flags')"
+  }, {
+    "type" : "table",
+    "id" : 516,
+    "level" : "1",
+    "page number" : 4,
+    "bounding box" : [ 58.223, 531.879, 286.843, 656.418 ],
+    "number of rows" : 12,
+    "number of columns" : 4,
+    "rows" : [ {
+      "type" : "table row",
+      "row number" : 1,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 646.04, 115.378, 656.418 ],
+        "row number" : 1,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 646.04, 286.843, 656.418 ],
+        "row number" : 1,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 3,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 314,
+          "page number" : 4,
+          "bounding box" : [ 115.378, 646.04, 286.843, 656.418 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "Context Window"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 646.04, 229.688, 656.418 ],
+        "row number" : 1,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 646.04, 286.843, 656.418 ],
+        "row number" : 1,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 2,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 635.661, 115.378, 646.04 ],
+        "row number" : 2,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 315,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 635.661, 115.378, 646.04 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Model / API name Showing 3 of 3 [01/24/2024]"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 635.661, 172.533, 646.04 ],
+        "row number" : 2,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 316,
+          "page number" : 4,
+          "bounding box" : [ 115.378, 635.661, 172.533, 646.04 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Open? results (page 1/1): yeah"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 635.661, 229.688, 646.04 ],
+        "row number" : 2,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 317,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 635.661, 229.688, 646.04 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Tokens"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 635.661, 286.843, 646.04 ],
+        "row number" : 2,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 318,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 635.661, 286.843, 646.04 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "∗ Messages"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 3,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 625.283, 115.378, 635.661 ],
+        "row number" : 3,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 319,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 625.283, 115.378, 635.661 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Llama (1) [01/14/2024]"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 625.283, 172.533, 635.661 ],
+        "row number" : 3,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 320,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 625.283, 172.533, 635.661 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "✓ 'lol six flags', 'i love six flags been"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 625.283, 229.688, 635.661 ],
+        "row number" : 3,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 321,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 625.283, 229.688, 635.661 ],
+          "font" : "font000000002b6f0026",
+          "font size" : 5.903,
+          "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+          "content" : "2k ﬂags been like 100 times”,"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 625.283, 286.843, 635.661 ],
+        "row number" : 3,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 322,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 625.283, 286.843, 635.661 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "20"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 4,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 614.905, 115.378, 625.283 ],
+        "row number" : 4,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 323,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 614.905, 115.378, 625.283 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "Llama 2 [10/12/2023]"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 614.905, 172.533, 625.283 ],
+        "row number" : 4,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 324,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 614.905, 172.533, 625.283 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "✓ 'james and I actually"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 614.905, 229.688, 625.283 ],
+        "row number" : 4,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 325,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 614.905, 229.688, 625.283 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "4k first met at six"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 614.905, 286.843, 625.283 ],
+        "row number" : 4,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 326,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 614.905, 286.843, 625.283 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "60 flags'"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 5,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 604.527, 115.378, 614.905 ],
+        "row number" : 5,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 327,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 604.527, 115.378, 614.905 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "GPT-3.5 Turbo"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 604.527, 172.533, 614.905 ],
+        "row number" : 5,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 328,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 604.527, 172.533, 614.905 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "✗"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 604.527, 229.688, 614.905 ],
+        "row number" : 5,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 329,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 604.527, 229.688, 614.905 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "4k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 604.527, 286.843, 614.905 ],
+        "row number" : 5,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 330,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 604.527, 286.843, 614.905 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "60"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 6,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 594.148, 115.378, 604.527 ],
+        "row number" : 6,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 331,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 594.148, 115.378, 604.527 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "Mistral 7B Did you"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 594.148, 172.533, 604.527 ],
+        "row number" : 6,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 332,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 594.148, 172.533, 604.527 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "✓ James? It's so"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 594.148, 229.688, 604.527 ],
+        "row number" : 6,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 333,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 594.148, 229.688, 604.527 ],
+          "font" : "font000000002b6f0026",
+          "font size" : 6.886,
+          "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+          "content" : "8k so cute how both"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 594.148, 286.843, 604.527 ],
+        "row number" : 6,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 334,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 594.148, 286.843, 604.527 ],
+          "font" : "font000000002b6f0026",
+          "font size" : 6.886,
+          "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+          "content" : "140 met there!"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 7,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 583.77, 115.378, 594.148 ],
+        "row number" : 7,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 335,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 583.77, 115.378, 594.148 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "GPT-4 (release)"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 583.77, 172.533, 594.148 ],
+        "row number" : 7,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 336,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 583.77, 172.533, 594.148 ],
+          "font" : "Dingbats",
+          "font size" : 8.966,
+          "text color" : "[1.0, 0.0, 0.0]",
+          "content" : "✗"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 583.77, 229.688, 594.148 ],
+        "row number" : 7,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 337,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 583.77, 229.688, 594.148 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "8k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 583.77, 286.843, 594.148 ],
+        "row number" : 7,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 338,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 583.77, 286.843, 594.148 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "140"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 8,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 573.392, 115.378, 583.77 ],
+        "row number" : 8,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 339,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 573.392, 115.378, 583.77 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "GPT-3.5 Turbo"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 573.392, 172.533, 583.77 ],
+        "row number" : 8,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 340,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 573.392, 172.533, 583.77 ],
+          "font" : "Dingbats",
+          "font size" : 8.966,
+          "text color" : "[1.0, 0.0, 0.0]",
+          "content" : "✗"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 573.392, 229.688, 583.77 ],
+        "row number" : 8,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 341,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 573.392, 229.688, 583.77 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "16k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 573.392, 286.843, 583.77 ],
+        "row number" : 8,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 342,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 573.392, 286.843, 583.77 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "300"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 9,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 563.014, 115.378, 573.392 ],
+        "row number" : 9,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 343,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 563.014, 115.378, 573.392 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "GPT-4"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 563.014, 172.533, 573.392 ],
+        "row number" : 9,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 344,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 563.014, 172.533, 573.392 ],
+          "font" : "Dingbats",
+          "font size" : 8.966,
+          "text color" : "[1.0, 0.0, 0.0]",
+          "content" : "✗"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 563.014, 229.688, 573.392 ],
+        "row number" : 9,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 345,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 563.014, 229.688, 573.392 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "32k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 563.014, 286.843, 573.392 ],
+        "row number" : 9,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 346,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 563.014, 286.843, 573.392 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "∼ 600"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 10,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 552.635, 115.378, 563.014 ],
+        "row number" : 10,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 347,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 552.635, 115.378, 563.014 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "Claude 2"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 552.635, 172.533, 563.014 ],
+        "row number" : 10,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 348,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 552.635, 172.533, 563.014 ],
+          "font" : "Dingbats",
+          "font size" : 8.966,
+          "text color" : "[1.0, 0.0, 0.0]",
+          "content" : "✗"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 552.635, 229.688, 563.014 ],
+        "row number" : 10,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 349,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 552.635, 229.688, 563.014 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "100k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 552.635, 286.843, 563.014 ],
+        "row number" : 10,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 350,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 552.635, 286.843, 563.014 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "∼ 2000"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 11,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 542.257, 115.378, 552.635 ],
+        "row number" : 11,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 351,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 542.257, 115.378, 552.635 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "GPT-4 Turbo"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 542.257, 172.533, 552.635 ],
+        "row number" : 11,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 352,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 542.257, 172.533, 552.635 ],
+          "font" : "Dingbats",
+          "font size" : 8.966,
+          "text color" : "[1.0, 0.0, 0.0]",
+          "content" : "✗"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 542.257, 229.688, 552.635 ],
+        "row number" : 11,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 353,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 542.257, 229.688, 552.635 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "128k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 542.257, 286.843, 552.635 ],
+        "row number" : 11,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 354,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 542.257, 286.843, 552.635 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "∼ 2600"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 12,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 58.223, 531.879, 115.378, 542.257 ],
+        "row number" : 12,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 355,
+          "page number" : 4,
+          "bounding box" : [ 58.223, 531.879, 115.378, 542.257 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "Yi-34B-200k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 115.378, 531.879, 172.533, 542.257 ],
+        "row number" : 12,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 356,
+          "level" : "1",
+          "page number" : 4,
+          "bounding box" : [ 115.378, 531.879, 172.533, 542.257 ],
+          "font" : "Dingbats",
+          "font size" : 8.966,
+          "text color" : "[0.13333, 0.5451, 0.13333]",
+          "content" : "✓"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 172.533, 531.879, 229.688, 542.257 ],
+        "row number" : 12,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 357,
+          "page number" : 4,
+          "bounding box" : [ 172.533, 531.879, 229.688, 542.257 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "200k"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 4,
+        "bounding box" : [ 229.688, 531.879, 286.843, 542.257 ],
+        "row number" : 12,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 358,
+          "page number" : 4,
+          "bounding box" : [ 229.688, 531.879, 286.843, 542.257 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 8.966,
+          "text color" : "[0.0]",
+          "content" : "∼ 4000"
+        } ]
+      } ]
+    } ]
+  }, {
+    "type" : "image",
+    "id" : 508,
+    "page number" : 4,
+    "bounding box" : [ 315.631, 601.576, 532.61, 723.963 ],
+    "source" : "memgpt_paper_images/imageFile4.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 509,
+    "page number" : 4,
+    "bounding box" : [ 405.792, 715.77, 440.671, 722.914 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 5.903,
+    "text color" : "[0.30980393290519714, 0.30980393290519714, 0.30980393290519714]",
+    "content" : "February 14"
+  }, {
+    "type" : "paragraph",
+    "id" : 511,
+    "page number" : 4,
+    "bounding box" : [ 329.412, 698.321, 476.793, 706.656 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.886,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "How’s James doing? Any special plans today?"
+  }, {
+    "type" : "paragraph",
+    "id" : 513,
+    "page number" : 4,
+    "bounding box" : [ 420.912, 677.059, 518.216, 685.395 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.886,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "actually james and i broke up"
+  }, {
+    "type" : "paragraph",
+    "id" : 515,
+    "page number" : 4,
+    "bounding box" : [ 329.141, 653.614, 428.304, 661.683 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "working_context.replace("
+  }, {
+    "type" : "paragraph",
+    "id" : 517,
+    "page number" : 4,
+    "bounding box" : [ 329.141, 645.498, 436.548, 653.567 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.886,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "“ Ex-boyfriend named James”"
+  }, {
+    "type" : "paragraph",
+    "id" : 518,
+    "page number" : 4,
+    "bounding box" : [ 329.141, 637.382, 444.807, 645.451 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Ex-boyfriend named James'"
+  }, {
+    "type" : "paragraph",
+    "id" : 519,
+    "page number" : 4,
+    "bounding box" : [ 329.141, 629.266, 333.273, 637.335 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : ")"
+  }, {
+    "type" : "paragraph",
+    "id" : 521,
+    "page number" : 4,
+    "bounding box" : [ 330.809, 603.673, 448.083, 612.008 ],
+    "font" : "font000000002b6f0026",
+    "font size" : 6.886,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "Sorry to hear that hope you’re OK \uD83D\uDC94"
+  }, {
+    "type" : "paragraph",
+    "id" : 522,
+    "page number" : 4,
+    "bounding box" : [ 448.124, 603.761, 457.922, 611.951 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "\uD83D\uDC94"
+  }, {
+    "type" : "paragraph",
+    "id" : 524,
+    "page number" : 4,
+    "bounding box" : [ 307.44, 548.899, 541.445, 578.514 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Figure 4. An example conversation snippet where MemGPT (left) updates stored information. Here the information is stored in working context memory (located within the prompt tokens)."
+  }, {
+    "type" : "heading",
+    "id" : 525,
+    "level" : "Doctitle",
+    "page number" : 4,
+    "bounding box" : [ 55.44, 482.17, 221.507, 491.126 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "2.4. Control flow and function chaining"
+  }, {
+    "type" : "paragraph",
+    "id" : 526,
+    "page number" : 4,
+    "bounding box" : [ 55.44, 343.982, 289.444, 472.265 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In MemGPT, events trigger LLM inference: events are generalized inputs to MemGPT and can consist of user messages (in chat applications), system messages (e.g. main context capacity warnings), user interactions (e.g. an alert that a user just logged in, or an alert that they finished uploading a document), and timed events that are run on a regular schedule (allowing MemGPT to run ‘unprompted’ without user intervention). MemGPT processes events with a parser to convert them into plain text messages that can be appended to main context and eventually be fed as input into the LLM processor."
+  }, {
+    "type" : "paragraph",
+    "id" : 528,
+    "page number" : 4,
+    "bounding box" : [ 55.44, 170.632, 289.442, 334.601 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Many practical tasks require calling multiple functions in sequence, for example, navigating through multiple pages of results from a single query or collating data from different documents in main context from separate queries. Function chaining allows MemGPT to execute multiple function calls sequentially before returning control to the user. In MemGPT, functions can be called with a special flag that requests control be immediately returned to the processor after the requested function completes execution. If this flag is present, MemGPT will add the function output to main context and (as opposed to pausing processor execution). If this flag is not present (a yield ), MemGPT will not run the LLM processor until the next external event trigger (e.g. a user message or scheduled interrupt)."
+  }, {
+    "type" : "heading",
+    "id" : 531,
+    "level" : "Subtitle",
+    "page number" : 4,
+    "bounding box" : [ 55.44, 141.634, 132.479, 152.382 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "3. Experiments"
+  }, {
+    "type" : "paragraph",
+    "id" : 532,
+    "page number" : 4,
+    "bounding box" : [ 55.44, 74.873, 289.442, 131.246 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "We assess MemGPT in two long-context domains: conversational agents and document analysis. For conversational agents, we expand the existing Multi-Session Chat dataset (Xu et al., 2021) and introduce two new dialogue tasks that evaluate an agent's ability to retain knowledge across long conversations. For document analysis, we benchmark MemGPT on existing tasks from (Liu et al., 2023a) for question answering and key-value retrieval over lengthy documents. We also propose a new nested keyvalue retrieval task requiring collating information across multiple data sources, which tests the ability of an agent to collate information from multiple data sources (multihop retrieval). We publicly release our augmented MSC dataset, nested KV retrieval dataset, and a dataset of embeddings for 20M Wikipedia articles to facilitate future research. Our code for the benchmarks is available at https://research.memgpt.ai."
+  }, {
+    "type" : "paragraph",
+    "id" : 527,
+    "page number" : 4,
+    "bounding box" : [ 307.44, 262.121, 541.443, 366.702 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Implementation details. When discussing OpenAI models, unless otherwise specified ‘GPT-4 Turbo’ refers to the specific gpt-4-1106-preview model endpoint (context window of 128 , 000 ), ‘GPT-4‘ refers to gpt-4-0613 (context window of 8 , 192 ), and ‘GPT-3.5 Turbo‘ refers to gpt-3.5-turbo-1106 (context window of 16 , 385 ). In experiments, we run MemGPT with all baseline models (GPT-4, GPT-4 Turbo, and GPT 3.5) to show how the underlying model performance affects MemGPT’s."
+  }, {
+    "type" : "heading",
+    "id" : 529,
+    "level" : "Subtitle",
+    "page number" : 4,
+    "bounding box" : [ 307.44, 236.972, 476.037, 245.928 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.1. MemGPT for conversational agents"
+  }, {
+    "type" : "paragraph",
+    "id" : 530,
+    "page number" : 4,
+    "bounding box" : [ 307.44, 74.873, 541.442, 226.887 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Conversational agents like virtual companions and personalized assistants aim to engage users in natural, long-term interactions, potentially spanning weeks, months, or even years. This creates challenges for models with fixed-length contexts, which can only reference a limited history of the conversation. An ‘infinite context’ agent should seamlessly handle continuous exchanges without boundary or reset. When conversing with a user, such an agent must satisfy two key criteria: (1) Consistency The agent should maintain conversational coherence. New facts, preferences, and events mentioned should align with prior statements from both the user and agent. (2) Engagement - The agent should draw on long-term knowledge about the user to personalize"
+  }, {
+    "type" : "paragraph",
+    "id" : 533,
+    "page number" : 5,
+    "bounding box" : [ 55.44, 663.103, 289.445, 714.986 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Table 2. Deep memory retrieval (DMR) performance. In this task, the agent is asked a specific question about a topic discussed in a prior conversation (sessions 1–5). The agent’s response is scored against the gold answer. MemGPT significantly outperforms the fixed-context baselines."
+  }, {
+    "type" : "table",
+    "id" : 535,
+    "level" : "2",
+    "page number" : 5,
+    "bounding box" : [ 63.068, 563.744, 280.925, 659.511 ],
+    "number of rows" : 7,
+    "number of columns" : 3,
+    "rows" : [ {
+      "type" : "table row",
+      "row number" : 1,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 63.068, 645.83, 135.687, 659.511 ],
+        "row number" : 1,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 360,
+          "page number" : 5,
+          "bounding box" : [ 63.068, 645.83, 135.687, 659.511 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "Model"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 135.687, 645.83, 208.306, 659.511 ],
+        "row number" : 1,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 361,
+          "page number" : 5,
+          "bounding box" : [ 135.687, 645.83, 208.306, 659.511 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "Accuracy ⇑"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 208.306, 645.83, 280.925, 659.511 ],
+        "row number" : 1,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 362,
+          "page number" : 5,
+          "bounding box" : [ 208.306, 645.83, 280.925, 659.511 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "ROUGE-L (R) ⇑"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 2,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 63.068, 632.149, 135.687, 645.83 ],
+        "row number" : 2,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 363,
+          "page number" : 5,
+          "bounding box" : [ 63.068, 632.149, 135.687, 645.83 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "GPT-3.5 Turbo"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 135.687, 632.149, 208.306, 645.83 ],
+        "row number" : 2,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 364,
+          "page number" : 5,
+          "bounding box" : [ 135.687, 632.149, 208.306, 645.83 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "38.7%"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 208.306, 632.149, 280.925, 645.83 ],
+        "row number" : 2,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 365,
+          "page number" : 5,
+          "bounding box" : [ 208.306, 632.149, 280.925, 645.83 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.394"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 3,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 63.068, 618.468, 135.687, 632.149 ],
+        "row number" : 3,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 366,
+          "level" : "1",
+          "page number" : 5,
+          "bounding box" : [ 63.068, 618.468, 135.687, 632.149 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "+ MemGPT"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 135.687, 618.468, 208.306, 632.149 ],
+        "row number" : 3,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 367,
+          "page number" : 5,
+          "bounding box" : [ 135.687, 618.468, 208.306, 632.149 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "66.9%"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 208.306, 618.468, 280.925, 632.149 ],
+        "row number" : 3,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 368,
+          "page number" : 5,
+          "bounding box" : [ 208.306, 618.468, 280.925, 632.149 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.629"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 4,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 63.068, 604.787, 135.687, 618.468 ],
+        "row number" : 4,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 369,
+          "page number" : 5,
+          "bounding box" : [ 63.068, 604.787, 135.687, 618.468 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "GPT-4"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 135.687, 604.787, 208.306, 618.468 ],
+        "row number" : 4,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 370,
+          "page number" : 5,
+          "bounding box" : [ 135.687, 604.787, 208.306, 618.468 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "32.1%"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 208.306, 604.787, 280.925, 618.468 ],
+        "row number" : 4,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 371,
+          "page number" : 5,
+          "bounding box" : [ 208.306, 604.787, 280.925, 618.468 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.296"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 5,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 63.068, 591.106, 135.687, 604.787 ],
+        "row number" : 5,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 372,
+          "level" : "1",
+          "page number" : 5,
+          "bounding box" : [ 63.068, 591.106, 135.687, 604.787 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "+ MemGPT"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 135.687, 591.106, 208.306, 604.787 ],
+        "row number" : 5,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 373,
+          "page number" : 5,
+          "bounding box" : [ 135.687, 591.106, 208.306, 604.787 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "92.5%"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 208.306, 591.106, 280.925, 604.787 ],
+        "row number" : 5,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 374,
+          "page number" : 5,
+          "bounding box" : [ 208.306, 591.106, 280.925, 604.787 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.814"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 6,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 63.068, 577.425, 135.687, 591.106 ],
+        "row number" : 6,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 375,
+          "page number" : 5,
+          "bounding box" : [ 63.068, 577.425, 135.687, 591.106 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "GPT-4 Turbo + MemGPT"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 135.687, 577.425, 208.306, 591.106 ],
+        "row number" : 6,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 376,
+          "page number" : 5,
+          "bounding box" : [ 135.687, 577.425, 208.306, 591.106 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "35.3%"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 208.306, 577.425, 280.925, 591.106 ],
+        "row number" : 6,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 377,
+          "page number" : 5,
+          "bounding box" : [ 208.306, 577.425, 280.925, 591.106 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "0.359"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 7,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 63.068, 563.744, 135.687, 577.425 ],
+        "row number" : 7,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 378,
+          "level" : "1",
+          "page number" : 5,
+          "bounding box" : [ 63.068, 563.744, 135.687, 577.425 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "+ MemGPT"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 135.687, 563.744, 208.306, 577.425 ],
+        "row number" : 7,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 379,
+          "page number" : 5,
+          "bounding box" : [ 135.687, 563.744, 208.306, 577.425 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "93.4%"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 208.306, 563.744, 280.925, 577.425 ],
+        "row number" : 7,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 380,
+          "page number" : 5,
+          "bounding box" : [ 208.306, 563.744, 280.925, 577.425 ],
+          "font" : null,
+          "font size" : 12.0,
+          "content" : "0.827"
+        } ]
+      } ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 534,
+    "page number" : 5,
+    "bounding box" : [ 307.44, 663.103, 541.445, 714.986 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Table 3. Conversation opener performance. The agent’s conversation opener is evaluated using similarity scores to the gold persona labels (SIM-1/3) and to the human-created opener (SIMH). MemGPT is able to exceed the performance of the humancreated conversation opener with a variety of underlying models."
+  }, {
+    "type" : "table",
+    "id" : 536,
+    "level" : "3",
+    "page number" : 5,
+    "bounding box" : [ 322.879, 580.86, 525.259, 657.304 ],
+    "number of rows" : 5,
+    "number of columns" : 4,
+    "rows" : [ {
+      "type" : "table row",
+      "row number" : 1,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 322.879, 642.015, 373.474, 657.304 ],
+        "row number" : 1,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 382,
+          "page number" : 5,
+          "bounding box" : [ 322.879, 642.015, 373.474, 657.304 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "Method"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 373.474, 642.015, 424.069, 657.304 ],
+        "row number" : 1,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 383,
+          "page number" : 5,
+          "bounding box" : [ 373.474, 642.015, 424.069, 657.304 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "⇑ SIM-1"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 424.069, 642.015, 474.664, 657.304 ],
+        "row number" : 1,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 384,
+          "page number" : 5,
+          "bounding box" : [ 424.069, 642.015, 474.664, 657.304 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "SIM-3"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 474.664, 642.015, 525.259, 657.304 ],
+        "row number" : 1,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 385,
+          "page number" : 5,
+          "bounding box" : [ 474.664, 642.015, 525.259, 657.304 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "SIM-H"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 2,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 322.879, 626.726, 373.474, 642.015 ],
+        "row number" : 2,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 386,
+          "page number" : 5,
+          "bounding box" : [ 322.879, 626.726, 373.474, 642.015 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "Human"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 373.474, 626.726, 424.069, 642.015 ],
+        "row number" : 2,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 387,
+          "page number" : 5,
+          "bounding box" : [ 373.474, 626.726, 424.069, 642.015 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.800"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 424.069, 626.726, 474.664, 642.015 ],
+        "row number" : 2,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 388,
+          "page number" : 5,
+          "bounding box" : [ 424.069, 626.726, 474.664, 642.015 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.800"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 474.664, 626.726, 525.259, 642.015 ],
+        "row number" : 2,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 389,
+          "page number" : 5,
+          "bounding box" : [ 474.664, 626.726, 525.259, 642.015 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "1.000"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 3,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 322.879, 611.438, 373.474, 626.726 ],
+        "row number" : 3,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 390,
+          "page number" : 5,
+          "bounding box" : [ 322.879, 611.438, 373.474, 626.726 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "GPT-3.5 Turbo"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 373.474, 611.438, 424.069, 626.726 ],
+        "row number" : 3,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 391,
+          "page number" : 5,
+          "bounding box" : [ 373.474, 611.438, 424.069, 626.726 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.830"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 424.069, 611.438, 474.664, 626.726 ],
+        "row number" : 3,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 392,
+          "page number" : 5,
+          "bounding box" : [ 424.069, 611.438, 474.664, 626.726 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.812"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 474.664, 611.438, 525.259, 626.726 ],
+        "row number" : 3,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 393,
+          "page number" : 5,
+          "bounding box" : [ 474.664, 611.438, 525.259, 626.726 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.817"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 4,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 322.879, 596.149, 373.474, 611.438 ],
+        "row number" : 4,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 394,
+          "page number" : 5,
+          "bounding box" : [ 322.879, 596.149, 373.474, 611.438 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "GPT-4"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 373.474, 596.149, 424.069, 611.438 ],
+        "row number" : 4,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 395,
+          "page number" : 5,
+          "bounding box" : [ 373.474, 596.149, 424.069, 611.438 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.868"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 424.069, 596.149, 474.664, 611.438 ],
+        "row number" : 4,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 396,
+          "page number" : 5,
+          "bounding box" : [ 424.069, 596.149, 474.664, 611.438 ],
+          "font" : "NimbusRomNo9L-Medi",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.843"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 474.664, 596.149, 525.259, 611.438 ],
+        "row number" : 4,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 397,
+          "page number" : 5,
+          "bounding box" : [ 474.664, 596.149, 525.259, 611.438 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.773"
+        } ]
+      } ]
+    }, {
+      "type" : "table row",
+      "row number" : 5,
+      "cells" : [ {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 322.879, 580.86, 373.474, 596.149 ],
+        "row number" : 5,
+        "column number" : 1,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 398,
+          "page number" : 5,
+          "bounding box" : [ 322.879, 580.86, 373.474, 596.149 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "GPT-4 Turbo"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 373.474, 580.86, 424.069, 596.149 ],
+        "row number" : 5,
+        "column number" : 2,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 399,
+          "page number" : 5,
+          "bounding box" : [ 373.474, 580.86, 424.069, 596.149 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.857"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 424.069, 580.86, 474.664, 596.149 ],
+        "row number" : 5,
+        "column number" : 3,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 400,
+          "page number" : 5,
+          "bounding box" : [ 424.069, 580.86, 474.664, 596.149 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.828"
+        } ]
+      }, {
+        "type" : "table cell",
+        "page number" : 5,
+        "bounding box" : [ 474.664, 580.86, 525.259, 596.149 ],
+        "row number" : 5,
+        "column number" : 4,
+        "row span" : 1,
+        "column span" : 1,
+        "kids" : [ {
+          "type" : "paragraph",
+          "id" : 401,
+          "page number" : 5,
+          "bounding box" : [ 474.664, 580.86, 525.259, 596.149 ],
+          "font" : "NimbusRomNo9L-Regu",
+          "font size" : 9.963,
+          "text color" : "[0.0]",
+          "content" : "0.767"
+        } ]
+      } ]
+    } ]
+  }, {
+    "type" : "paragraph",
+    "id" : 538,
+    "page number" : 5,
+    "bounding box" : [ 55.44, 350.344, 289.442, 502.358 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We therefore assess our proposed system, MemGPT, on these two criteria: (1) Does MemGPT leverage its memory to improve conversation consistency? Can it remember relevant facts, preferences, and events from past interactions to maintain coherence? (2) Does MemGPT produce more engaging dialogue by taking advantage of memory? Does it spontaneously incorporate long-range user information to personalize messages? By evaluating on consistency and engagement, we can determine how well MemGPT handles the challenges of long-term conversational interaction compared to fixed-context baselines. Its ability to satisfy these criteria will demonstrate whether unbounded context provides meaningful benefits for conversational agents."
+  }, {
+    "type" : "paragraph",
+    "id" : 540,
+    "page number" : 5,
+    "bounding box" : [ 55.44, 224.815, 289.444, 341.351 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Dataset. We evaluate MemGPT and our fixed-context baselines on the Multi-Session Chat (MSC) dataset introduced by Xu et al. (2021), which contains multi-session chat logs generated by human labelers, each of whom was asked to play a consistent persona for the duration of all sessions. Each multi-session chat in MSC has five total sessions, and each session consists of a roughly a dozen messages. As part of our consistency experiments, we created a new session (session 6) that contains a single questionanswer response pair between the same two personas."
+  }, {
+    "type" : "heading",
+    "id" : 541,
+    "level" : "Doctitle",
+    "page number" : 5,
+    "bounding box" : [ 55.689, 189.167, 221.858, 209.674 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "3.1.1. D EEP MEMORY RETRIEVAL TASK ( CONSISTENCY )."
+  }, {
+    "type" : "paragraph",
+    "id" : 544,
+    "page number" : 5,
+    "bounding box" : [ 55.44, 74.873, 289.442, 179.066 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We introduce a new ‘deep memory retrieval’ (DMR) task based on the MSC dataset designed to test the consistency of a conversational agent. In DMR, the conversational agent is asked a question by the user that explicitly refers back to a prior conversation and has a very narrow expected answer range. We generated the DMR question-answer (QA) pairs using a separate LLM that was instructed to write a question from one user to another that could only be answered correctly using knowledge gained from the past"
+  }, {
+    "type" : "paragraph",
+    "id" : 537,
+    "page number" : 5,
+    "bounding box" : [ 307.44, 398.165, 541.442, 526.269 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We evaluate the quality of the generated response against the ‘gold response’ using ROUGE-L scores (Lin, 2004) and an ‘LLM judge’, which is instructed to evaluate whether or not the generated response is consistent with the gold response (GPT-4 has been shown to have high agreement with human evaluators (Zheng et al., 2023)). In practice, we notice that the generated responses (from both MemGPT and the baselines) were generally more verbose than the gold responses. We use the ROUGE-L recall (R) metric to account for the verbosity of the generated agent replies compared to the relatively short gold answer labels."
+  }, {
+    "type" : "paragraph",
+    "id" : 539,
+    "page number" : 5,
+    "bounding box" : [ 307.44, 224.815, 541.442, 389.172 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "MemGPT utilizes memory to maintain coherence: Table 2 shows the performance of MemGPT vs the fixedmemory baselines. We compare MemGPT using different underlying LLMs, and compare against using the base LLM without MemGPT as a baseline. The baselines are able to see a lossy summarization of the past five conversations to mimic an extended recursive summarization procedure, while MemGPT instead has access to the full conversation history but must access it via paginated search queries to recall memory (in order to bring them into main context). In this task, we see that MemGPT clearly improves the performance of the underlying base LLM: there is a clear drop in both accuracy and ROUGE scores when going from MemGPT to the corresponding LLM baselines."
+  }, {
+    "type" : "heading",
+    "id" : 542,
+    "level" : "Subtitle",
+    "page number" : 5,
+    "bounding box" : [ 307.689, 201.122, 537.424, 209.674 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "3.1.2. C ONVERSATION OPENER TASK ( ENGAGEMENT )."
+  }, {
+    "type" : "paragraph",
+    "id" : 543,
+    "page number" : 5,
+    "bounding box" : [ 307.44, 74.873, 541.442, 191.022 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In the ‘conversation opener’ task we evaluate an agent’s ability to craft engaging messages to the user that draw from knowledge accumulated in prior conversations. To evaluate the ‘engagingness’ of a conversation opener using the MSC dataset, we compare the generated opener to the gold personas: an engaging conversation opener should draw from one (or several) of the data points contained in the persona, which in MSC effectively summarize the knowledge accumulated throughout all prior sessions. We also compare to the human-generated gold opener, i.e., the"
+  }, {
+    "type" : "image",
+    "id" : 545,
+    "page number" : 6,
+    "bounding box" : [ 58.719, 584.135, 286.127, 722.515 ],
+    "source" : "memgpt_paper_images/imageFile5.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 549,
+    "page number" : 6,
+    "bounding box" : [ 67.842, 713.775, 74.713, 718.307 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0.7"
+  }, {
+    "type" : "paragraph",
+    "id" : 550,
+    "page number" : 6,
+    "bounding box" : [ 67.842, 698.558, 74.713, 703.089 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0.6"
+  }, {
+    "type" : "paragraph",
+    "id" : 553,
+    "page number" : 6,
+    "bounding box" : [ 67.842, 683.34, 74.713, 687.871 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0.5"
+  }, {
+    "type" : "paragraph",
+    "id" : 552,
+    "page number" : 6,
+    "bounding box" : [ 59.843, 659.064, 65.281, 685.807 ],
+    "font" : "TimesNewRomanPS-BoldMT",
+    "font size" : 6.597,
+    "text color" : "[0.15]",
+    "content" : "Accuracy"
+  }, {
+    "type" : "paragraph",
+    "id" : 556,
+    "page number" : 6,
+    "bounding box" : [ 67.842, 668.122, 74.713, 672.654 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0.4"
+  }, {
+    "type" : "paragraph",
+    "id" : 559,
+    "page number" : 6,
+    "bounding box" : [ 67.842, 652.905, 74.713, 657.436 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0.3"
+  }, {
+    "type" : "paragraph",
+    "id" : 563,
+    "page number" : 6,
+    "bounding box" : [ 67.842, 637.687, 74.713, 642.218 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0.2"
+  }, {
+    "type" : "paragraph",
+    "id" : 566,
+    "page number" : 6,
+    "bounding box" : [ 67.842, 622.469, 74.713, 627.001 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0.1"
+  }, {
+    "type" : "paragraph",
+    "id" : 568,
+    "page number" : 6,
+    "bounding box" : [ 85.633, 615.345, 88.381, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "0"
+  }, {
+    "type" : "paragraph",
+    "id" : 569,
+    "page number" : 6,
+    "bounding box" : [ 107.849, 615.345, 113.347, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "25"
+  }, {
+    "type" : "paragraph",
+    "id" : 570,
+    "page number" : 6,
+    "bounding box" : [ 131.44, 615.345, 136.938, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "50"
+  }, {
+    "type" : "paragraph",
+    "id" : 571,
+    "page number" : 6,
+    "bounding box" : [ 155.031, 615.345, 160.529, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "75"
+  }, {
+    "type" : "paragraph",
+    "id" : 572,
+    "page number" : 6,
+    "bounding box" : [ 177.248, 615.345, 185.494, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "100"
+  }, {
+    "type" : "paragraph",
+    "id" : 573,
+    "page number" : 6,
+    "bounding box" : [ 200.839, 615.345, 209.085, 619.876 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "125"
+  }, {
+    "type" : "paragraph",
+    "id" : 574,
+    "page number" : 6,
+    "bounding box" : [ 224.43, 615.345, 232.676, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "150"
+  }, {
+    "type" : "paragraph",
+    "id" : 575,
+    "page number" : 6,
+    "bounding box" : [ 248.021, 615.345, 256.267, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "175"
+  }, {
+    "type" : "paragraph",
+    "id" : 576,
+    "page number" : 6,
+    "bounding box" : [ 271.612, 615.345, 279.858, 619.876 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "200"
+  }, {
+    "type" : "paragraph",
+    "id" : 578,
+    "page number" : 6,
+    "bounding box" : [ 151.517, 607.419, 212.155, 612.857 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Documents Retrieved"
+  }, {
+    "type" : "paragraph",
+    "id" : 583,
+    "page number" : 6,
+    "bounding box" : [ 130.11, 594.793, 144.576, 599.324 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "GPT-4"
+  }, {
+    "type" : "paragraph",
+    "id" : 584,
+    "page number" : 6,
+    "bounding box" : [ 170.979, 594.793, 204.094, 599.324 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "GPT-3.5 Turbo"
+  }, {
+    "type" : "paragraph",
+    "id" : 585,
+    "page number" : 6,
+    "bounding box" : [ 230.505, 594.793, 259.496, 599.324 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "GPT-4 Turbo"
+  }, {
+    "type" : "paragraph",
+    "id" : 587,
+    "page number" : 6,
+    "bounding box" : [ 114.374, 585.084, 187.51, 589.615 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "MemGPT (GPT-4, GPT-4 Turbo)"
+  }, {
+    "type" : "paragraph",
+    "id" : 588,
+    "page number" : 6,
+    "bounding box" : [ 213.961, 585.084, 259.48, 589.615 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.497,
+    "text color" : "[0.15]",
+    "content" : "MemGPT (GPT-3.5)"
+  }, {
+    "type" : "paragraph",
+    "id" : 593,
+    "page number" : 6,
+    "bounding box" : [ 55.44, 485.121, 289.445, 558.921 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Figure 5. Document QA task performance. MemGPT’s performance is unaffected by increased context length. Methods such as truncation can extend the effective context lengths of fixed length models such as GPT-4, but such compression methods will lead to performance degradation as the necessary compression grows. Running MemGPT with GPT-4 and GPT-4 Turbo have equivalent results on this task."
+  }, {
+    "type" : "paragraph",
+    "id" : 599,
+    "page number" : 6,
+    "bounding box" : [ 55.44, 321.897, 289.442, 414.523 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "MemGPT utilizes memory to increase engagement: As seen in Table 3, MemGPT is able to craft engaging openers that perform similarly to and occasionally exceed the hand-written human openers. We observe that MemGPT tends to craft openers that are both more verbose and cover more aspects of the persona information than the human baseline. Additionally, we can see the storing information in working context is key to generating engaging openers."
+  }, {
+    "type" : "heading",
+    "id" : 600,
+    "level" : "Subtitle",
+    "page number" : 6,
+    "bounding box" : [ 55.44, 296.747, 211.265, 305.703 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "3.2. MemGPT for document analysis"
+  }, {
+    "type" : "paragraph",
+    "id" : 602,
+    "page number" : 6,
+    "bounding box" : [ 55.44, 74.873, 289.442, 286.663 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Document analysis also faces challenges due to the limited context windows of today’s transformer models. As shown in Table 1, both open and closed source models suffer from constrained context length (up to 128k tokens for OpenAI’s models). However many documents easily surpass these lengths; for example, legal or financial documents such as Annual Reports (SEC Form 10-K) can easily pass the million token mark. Moreover, many real document analysis tasks require drawing connections across multiple such lengthy documents. Anticipating these scenarios, it becomes difficult to envision blindly scaling up context as a solution to the fixed-context problem. Recent research (Liu et al., 2023a) also raises doubts about the utility of simply scaling contexts, since they find uneven attention distributions in large context models (the model is more capable of recalling information at the beginning or end of its context window, vs tokens in the middle). To enable reasoning across documents, more flexible memory architectures like"
+  }, {
+    "type" : "image",
+    "id" : 546,
+    "page number" : 6,
+    "bounding box" : [ 315.628, 561.544, 532.771, 725.189 ],
+    "source" : "memgpt_paper_images/imageFile6.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 547,
+    "page number" : 6,
+    "bounding box" : [ 320.633, 717.734, 461.839, 724.718 ],
+    "font" : "font000000002b70440c",
+    "font size" : 5.77,
+    "text color" : "[0.4156862795352936, 0.658823549747467, 0.30980393290519714]",
+    "content" : "System Alert: Archive Storage Upload Complete"
+  }, {
+    "type" : "paragraph",
+    "id" : 551,
+    "page number" : 6,
+    "bounding box" : [ 382.128, 698.408, 515.225, 706.556 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "Who won the ﬁrst Nobel Prize in physics?"
+  }, {
+    "type" : "paragraph",
+    "id" : 554,
+    "page number" : 6,
+    "bounding box" : [ 329.534, 678.381, 491.024, 686.268 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“ nobel physics ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 557,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 661.395, 443.276, 668.378 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Showing 10 of 124 results (page 1/13):"
+  }, {
+    "type" : "paragraph",
+    "id" : 560,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 654.183, 473.982, 661.166 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'The Nobel Prizes, beginning in 1901, and the …"
+  }, {
+    "type" : "paragraph",
+    "id" : 562,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 646.971, 494.218, 653.954 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'This award is administered by the Nobel Foundation…"
+  }, {
+    "type" : "paragraph",
+    "id" : 564,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 639.759, 349.329, 646.742 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "…"
+  }, {
+    "type" : "paragraph",
+    "id" : 567,
+    "page number" : 6,
+    "bounding box" : [ 329.411, 620.684, 523.197, 628.571 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“ nobel physics ”, page=2 )"
+  }, {
+    "type" : "paragraph",
+    "id" : 579,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 603.698, 443.276, 610.682 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Showing 10 of 124 results (page 2/13):"
+  }, {
+    "type" : "paragraph",
+    "id" : 581,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 596.486, 485.7, 603.47 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'The Nobel Prize in Physics is a yearly award given…"
+  }, {
+    "type" : "paragraph",
+    "id" : 586,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 589.274, 492.263, 596.258 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'The 1901 Nobel in physics was awarded to Wilhelm …"
+  }, {
+    "type" : "paragraph",
+    "id" : 589,
+    "page number" : 6,
+    "bounding box" : [ 340.247, 582.062, 349.329, 589.045 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "…"
+  }, {
+    "type" : "paragraph",
+    "id" : 591,
+    "page number" : 6,
+    "bounding box" : [ 328.529, 562.787, 409.412, 570.935 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "Wilhelm Conrad Rontgen"
+  }, {
+    "type" : "paragraph",
+    "id" : 548,
+    "page number" : 6,
+    "bounding box" : [ 551.419, 717.734, 608.596, 724.718 ],
+    "font" : "font000000002b70440c",
+    "font size" : 5.77,
+    "text color" : "[0.4156862795352936, 0.658823549747467, 0.30980393290519714]",
+    "content" : "System Alert: Archive"
+  }, {
+    "type" : "paragraph",
+    "id" : 555,
+    "page number" : 6,
+    "bounding box" : [ 559.4, 678.381, 611.904, 686.268 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“"
+  }, {
+    "type" : "paragraph",
+    "id" : 558,
+    "page number" : 6,
+    "bounding box" : [ 570.607, 659.521, 611.814, 666.504 ],
+    "font" : "font000000002b70440c",
+    "font size" : 5.77,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "Showing 1 of 1 “Key: 831…ea5"
+  }, {
+    "type" : "paragraph",
+    "id" : 561,
+    "page number" : 6,
+    "bounding box" : [ 570.607, 652.309, 611.217, 659.292 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Key: 831…ea"
+  }, {
+    "type" : "paragraph",
+    "id" : 565,
+    "page number" : 6,
+    "bounding box" : [ 559.4, 630.973, 611.904, 638.861 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“"
+  }, {
+    "type" : "paragraph",
+    "id" : 577,
+    "page number" : 6,
+    "bounding box" : [ 570.883, 612.267, 610.596, 619.25 ],
+    "font" : "font000000002b70440c",
+    "font size" : 5.77,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "Showing 2 of 2 “Key: 5b8…4c3"
+  }, {
+    "type" : "paragraph",
+    "id" : 580,
+    "page number" : 6,
+    "bounding box" : [ 570.883, 605.054, 611.314, 612.038 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Key: 5b8…4c"
+  }, {
+    "type" : "paragraph",
+    "id" : 582,
+    "page number" : 6,
+    "bounding box" : [ 570.883, 597.842, 611.461, 604.826 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Key: 831…ea"
+  }, {
+    "type" : "paragraph",
+    "id" : 590,
+    "page number" : 6,
+    "bounding box" : [ 559.4, 576.888, 611.904, 584.776 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“"
+  }, {
+    "type" : "paragraph",
+    "id" : 592,
+    "page number" : 6,
+    "bounding box" : [ 570.607, 558.028, 611.814, 565.011 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Showing 1 of 1"
+  }, {
+    "type" : "paragraph",
+    "id" : 594,
+    "page number" : 6,
+    "bounding box" : [ 570.607, 550.816, 611.006, 557.799 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Key: 5b8…4c"
+  }, {
+    "type" : "paragraph",
+    "id" : 595,
+    "page number" : 6,
+    "bounding box" : [ 559.316, 528.169, 586.463, 536.317 ],
+    "font" : "font000000002b70440c",
+    "font size" : 6.731,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "f37…617"
+  }, {
+    "type" : "paragraph",
+    "id" : 596,
+    "page number" : 6,
+    "bounding box" : [ 307.44, 463.918, 395.141, 472.47 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "MemGPT are needed."
+  }, {
+    "type" : "heading",
+    "id" : 597,
+    "level" : "Subtitle",
+    "page number" : 6,
+    "bounding box" : [ 307.689, 440.225, 521.973, 448.777 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "3.2.1. M ULTI DOCUMENT QUESTION ANSWERING ."
+  }, {
+    "type" : "paragraph",
+    "id" : 598,
+    "page number" : 6,
+    "bounding box" : [ 307.44, 313.977, 541.442, 430.125 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "To evaluate MemGPT’s ability to analyze documents, we benchmark MemGPT against fixed-context baselines on the retriever-reader document QA task from Liu et al. (2023a). In this task, a question is selected from the NaturalQuestions-Open dataset, and a retriever selects relevant Wikipedia documents for the question. A reader model (the LLM) is then fed these documents as input, and is asked to use the provided documents to answer the question. Similar to Liu et al. (2023a), we evaluate reader accuracy as the number of retrieved documents K increases."
+  }, {
+    "type" : "paragraph",
+    "id" : 601,
+    "page number" : 6,
+    "bounding box" : [ 307.44, 104.761, 541.442, 304.596 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In our evaluation setup, both the fixed-context baselines and MemGPT use the same retriever, which selects the top K documents according using similarity search (cosine distance) on OpenAI’s text-embedding-ada-002 embeddings. We use MemGPT’s default storage settings which uses PostgreSQL for archival memory storage with vector search enabled via the pgvector extention. We precompute embeddings and load them into the database, which uses an HNSW index to enable approximate, subsecond query times. In MemGPT, the entire embedding document set is loaded into archival storage, and the retriever naturally emerges via the archival storage search functionality (which performs vector search based on cosine similarity). In the fixed-context baselines, the topK documents are fetched using the retriever independently from the LLM inference, similar to the original retrieverreader setup in Liu et al. (2023a)."
+  }, {
+    "type" : "paragraph",
+    "id" : 603,
+    "page number" : 6,
+    "bounding box" : [ 307.44, 74.873, 541.442, 95.38 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We use a dump of Wikipedia from late 2018, following past work on NaturalQuestions-Open (Izacard & Grave, 2020;"
+  }, {
+    "type" : "paragraph",
+    "id" : 606,
+    "page number" : 7,
+    "bounding box" : [ 82.4, 715.363, 227.714, 722.549 ],
+    "font" : "font000000002b704096",
+    "font size" : 5.937,
+    "text color" : "[0.4156862795352936, 0.658823549747467, 0.30980393290519714]",
+    "content" : "System Alert: Archive Storage Upload Complete"
+  }, {
+    "type" : "image",
+    "id" : 604,
+    "page number" : 7,
+    "bounding box" : [ 66.148, 593.596, 279.132, 721.466 ],
+    "source" : "memgpt_paper_images/imageFile7.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 605,
+    "page number" : 7,
+    "bounding box" : [ 74.614, 714.297, 81.19, 718.634 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.261,
+    "text color" : "[0.15]",
+    "content" : "1.0"
+  }, {
+    "type" : "paragraph",
+    "id" : 610,
+    "page number" : 7,
+    "bounding box" : [ 145.684, 695.475, 282.653, 703.859 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "Who won the ﬁrst Nobel Prize in physics?"
+  }, {
+    "type" : "paragraph",
+    "id" : 609,
+    "page number" : 7,
+    "bounding box" : [ 74.614, 697.569, 81.19, 701.906 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.261,
+    "text color" : "[0.15]",
+    "content" : "0.8"
+  }, {
+    "type" : "paragraph",
+    "id" : 612,
+    "page number" : 7,
+    "bounding box" : [ 66.959, 662.352, 72.163, 687.944 ],
+    "font" : "TimesNewRomanPS-BoldMT",
+    "font size" : 6.313,
+    "text color" : "[0.15]",
+    "content" : "Accuracy"
+  }, {
+    "type" : "paragraph",
+    "id" : 613,
+    "page number" : 7,
+    "bounding box" : [ 74.614, 680.841, 81.19, 685.177 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.261,
+    "text color" : "[0.15]",
+    "content" : "0.6"
+  }, {
+    "type" : "paragraph",
+    "id" : 614,
+    "page number" : 7,
+    "bounding box" : [ 91.561, 674.865, 257.748, 682.982 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“ nobel physics ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 616,
+    "page number" : 7,
+    "bounding box" : [ 74.614, 664.113, 81.19, 668.449 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.261,
+    "text color" : "[0.15]",
+    "content" : "0.4"
+  }, {
+    "type" : "paragraph",
+    "id" : 617,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 657.385, 208.611, 664.571 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Showing 10 of 124 results (page 1/13):"
+  }, {
+    "type" : "paragraph",
+    "id" : 619,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 649.963, 240.21, 657.15 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'The Nobel Prizes, beginning in 1901, and the …"
+  }, {
+    "type" : "paragraph",
+    "id" : 620,
+    "page number" : 7,
+    "bounding box" : [ 74.614, 647.385, 81.19, 651.721 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.261,
+    "text color" : "[0.15]",
+    "content" : "0.2"
+  }, {
+    "type" : "paragraph",
+    "id" : 622,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 642.541, 261.034, 649.728 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'This award is administered by the Nobel Foundation…"
+  }, {
+    "type" : "paragraph",
+    "id" : 623,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 635.119, 111.931, 642.306 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "…"
+  }, {
+    "type" : "paragraph",
+    "id" : 624,
+    "page number" : 7,
+    "bounding box" : [ 74.614, 630.656, 81.19, 634.993 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.261,
+    "text color" : "[0.15]",
+    "content" : "0.0"
+  }, {
+    "type" : "paragraph",
+    "id" : 627,
+    "page number" : 7,
+    "bounding box" : [ 92.336, 620.967, 94.966, 625.303 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "0"
+  }, {
+    "type" : "paragraph",
+    "id" : 628,
+    "page number" : 7,
+    "bounding box" : [ 150.86, 620.967, 153.491, 625.303 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "1"
+  }, {
+    "type" : "paragraph",
+    "id" : 629,
+    "page number" : 7,
+    "bounding box" : [ 209.385, 620.967, 212.015, 625.303 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "2"
+  }, {
+    "type" : "paragraph",
+    "id" : 630,
+    "page number" : 7,
+    "bounding box" : [ 267.909, 620.967, 270.539, 625.303 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "3"
+  }, {
+    "type" : "paragraph",
+    "id" : 626,
+    "page number" : 7,
+    "bounding box" : [ 91.434, 615.49, 290.856, 623.607 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "0 1 2 3  esting Level archival_storage.search(“ nobel physics ”, page=1 )"
+  }, {
+    "type" : "paragraph",
+    "id" : 631,
+    "page number" : 7,
+    "bounding box" : [ 163.115, 613.284, 199.762, 618.488 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "/glyph1197esting Level"
+  }, {
+    "type" : "paragraph",
+    "id" : 634,
+    "page number" : 7,
+    "bounding box" : [ 107.8, 601.481, 125.588, 605.817 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "GPT-3.5"
+  }, {
+    "type" : "paragraph",
+    "id" : 635,
+    "page number" : 7,
+    "bounding box" : [ 150.856, 601.481, 178.6, 605.817 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "GPT-4 Turbo"
+  }, {
+    "type" : "paragraph",
+    "id" : 636,
+    "page number" : 7,
+    "bounding box" : [ 219.707, 601.481, 273.223, 605.817 ],
+    "font" : "TimesNewRomanPSMT",
+    "font size" : 5.261,
+    "text color" : "[0.15]",
+    "content" : "MemGPT (GPT-4 Turbo) MemGPT (GPT-4)"
+  }, {
+    "type" : "paragraph",
+    "id" : 633,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 598.01, 208.611, 605.197 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "Showing 10 of 124 results (page 1/13):"
+  }, {
+    "type" : "paragraph",
+    "id" : 639,
+    "page number" : 7,
+    "bounding box" : [ 107.8, 594.042, 121.643, 598.378 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "GPT-4"
+  }, {
+    "type" : "paragraph",
+    "id" : 640,
+    "page number" : 7,
+    "bounding box" : [ 150.856, 594.042, 194.416, 598.378 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "MemGPT (GPT-3.5)"
+  }, {
+    "type" : "paragraph",
+    "id" : 641,
+    "page number" : 7,
+    "bounding box" : [ 219.707, 594.042, 259.321, 598.378 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "MemGPT (GPT-4)"
+  }, {
+    "type" : "paragraph",
+    "id" : 638,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 590.588, 252.269, 597.775 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'The Nobel Prize in Physics is a yearly award given…"
+  }, {
+    "type" : "paragraph",
+    "id" : 643,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 583.166, 259.022, 590.353 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'The 1901 Nobel in physics was awarded to Wilhelm …"
+  }, {
+    "type" : "paragraph",
+    "id" : 644,
+    "page number" : 7,
+    "bounding box" : [ 102.585, 575.744, 111.931, 582.931 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "…"
+  }, {
+    "type" : "paragraph",
+    "id" : 646,
+    "page number" : 7,
+    "bounding box" : [ 55.44, 516.273, 289.445, 568.156 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Figure 7. Nested KV retrieval task performance. MemGPT is the only approach that is able to consistently complete the nested KV task beyond 2 nesting levels. While GPT-4 Turbo performs better as a baseline, MemGPT with GPT-4 Turbo performs worse than MemGPT with GPT-4. Wilhelm Conrad Rontgen"
+  }, {
+    "type" : "image",
+    "id" : 607,
+    "page number" : 7,
+    "bounding box" : [ 314.885, 518.142, 533.542, 722.949 ],
+    "source" : "memgpt_paper_images/imageFile8.png"
+  }, {
+    "type" : "paragraph",
+    "id" : 608,
+    "page number" : 7,
+    "bounding box" : [ 319.899, 715.363, 465.213, 722.549 ],
+    "font" : "font000000002b704096",
+    "font size" : 5.937,
+    "text color" : "[0.4156862795352936, 0.658823549747467, 0.30980393290519714]",
+    "content" : "System Alert: Archive Storage Upload Complete"
+  }, {
+    "type" : "paragraph",
+    "id" : 611,
+    "page number" : 7,
+    "bounding box" : [ 418.282, 695.475, 521.586, 703.859 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[1.0, 1.0, 1.0]",
+    "content" : "Find the value for key 831…ea5"
+  }, {
+    "type" : "paragraph",
+    "id" : 615,
+    "page number" : 7,
+    "bounding box" : [ 328.112, 674.865, 477.681, 682.982 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“ 831...ea5 ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 618,
+    "page number" : 7,
+    "bounding box" : [ 339.645, 655.456, 432.11, 662.643 ],
+    "font" : "font000000002b704096",
+    "font size" : 5.937,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "Showing 1 of 1 results (page 1/1): “Key: 831…ea5 , Value: 5b8…4c3 ”"
+  }, {
+    "type" : "paragraph",
+    "id" : 621,
+    "page number" : 7,
+    "bounding box" : [ 339.645, 648.034, 433.853, 655.221 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Key: 831…ea5, Value: 5b8…4c3'"
+  }, {
+    "type" : "paragraph",
+    "id" : 625,
+    "page number" : 7,
+    "bounding box" : [ 328.112, 626.078, 477.681, 634.195 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“ 5b8...4c3 ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 632,
+    "page number" : 7,
+    "bounding box" : [ 339.929, 606.828, 432.394, 614.014 ],
+    "font" : "font000000002b704096",
+    "font size" : 5.937,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "Showing 2 of 2 results (page 1/1): “Key: 5b8…4c3 , Value: f37…617 ”,"
+  }, {
+    "type" : "paragraph",
+    "id" : 637,
+    "page number" : 7,
+    "bounding box" : [ 339.929, 599.406, 434.429, 606.592 ],
+    "font" : "font000000002b704096",
+    "font size" : 5.937,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "“Key: 831…ea5, Value: 5b8…4c3 ”"
+  }, {
+    "type" : "paragraph",
+    "id" : 642,
+    "page number" : 7,
+    "bounding box" : [ 339.929, 591.984, 434.137, 599.17 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Key: 831…ea5, Value: 5b8…4c3'"
+  }, {
+    "type" : "paragraph",
+    "id" : 645,
+    "page number" : 7,
+    "bounding box" : [ 328.112, 570.42, 477.681, 578.537 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "archival_storage.search(“ f37...617 ”)"
+  }, {
+    "type" : "paragraph",
+    "id" : 647,
+    "page number" : 7,
+    "bounding box" : [ 339.645, 551.011, 432.11, 558.198 ],
+    "font" : "font000000002b704096",
+    "font size" : 5.937,
+    "text color" : "[0.6039215922355652, 0.6039215922355652, 0.6039215922355652]",
+    "content" : "Showing 1 of 1 results (page 1/1): “Key: 5b8…4c3, Value: f37…617 ”"
+  }, {
+    "type" : "paragraph",
+    "id" : 648,
+    "page number" : 7,
+    "bounding box" : [ 339.645, 543.589, 432.572, 550.776 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "'Key: 5b8…4c3, Value: f37…617'"
+  }, {
+    "type" : "paragraph",
+    "id" : 649,
+    "page number" : 7,
+    "bounding box" : [ 328.025, 520.284, 355.962, 528.669 ],
+    "font" : "font000000002b704096",
+    "font size" : 6.927,
+    "text color" : "[0.14509804546833038, 0.14509804546833038, 0.14509804546833038]",
+    "content" : "f37…617"
+  }, {
+    "type" : "paragraph",
+    "id" : 651,
+    "page number" : 7,
+    "bounding box" : [ 55.44, 409.618, 289.442, 489.901 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Izacard et al., 2021), and sampled a subset of 50 questions for evaluation. Both the sampled questions and embedded Wikipedia passages are publicaly released. We evaluate the performance of both MemGPT and baselines with an LLM-judge, to ensure that the the answer is properly derived from the retrieved documents and to avoid non-exact string matches being considered incorrect."
+  }, {
+    "type" : "paragraph",
+    "id" : 652,
+    "page number" : 7,
+    "bounding box" : [ 55.44, 224.313, 289.442, 400.237 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "We show the results for the document QA task in Figure 5. The fixed-context baselines performance is capped roughly at the performance of the retriever, as they use the information that is presented in their context window (e.g. if the embedding search retriever fails to surface the gold article using the provided question, the fixed-context baselines are guaranteed to never see the gold article). By contrast, MemGPT is effectively able to make multiple calls to the retriever by querying archival storage, allowing it to scale to larger effective context lengths. MemGPT actively retrieves documents from its archival storage (and can iteratively page through results), so the total number of documents available to MemGPT is no longer limited by the number of documents that fit within the LLM processor’s context window."
+  }, {
+    "type" : "paragraph",
+    "id" : 654,
+    "page number" : 7,
+    "bounding box" : [ 55.44, 74.873, 289.442, 214.932 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The document QA task is challenging for all methods due to the limitations of embedding-based similarity search. We observe that the golden document for chosen question (as annotated by NaturalQuestions-Open) often appears outside of the first dozen retrieved results, if not even further. The retriever performance translates directly to the fixed-context baseline results: GPT-4’s accuracy is relatively low with few retrieved documents, and continues to improve as additional documents are added to the context window, as it correctly limits itself to answering questions based on information in retrieved documents. While MemGPT is theoretically not limited by sub-optimal re-"
+  }, {
+    "type" : "paragraph",
+    "id" : 650,
+    "page number" : 7,
+    "bounding box" : [ 307.44, 433.098, 541.445, 495.59 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Figure 8. An example of MemGPT (left) solving the nested KV task (UUIDs shortened for readability). In this particular example, the key-value pair has two nesting levels: 831..ea5 → 5b8..4c3 → f37...617 . The MemGPT agent returns the final answer when a query for the final value ( f37...617 ) only returns one result, indicating that it is not also a key."
+  }, {
+    "type" : "paragraph",
+    "id" : 653,
+    "page number" : 7,
+    "bounding box" : [ 307.44, 212.86, 541.442, 329.008 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "To evaluate the fixed-context baselines against MemGPT past their default context lengths, we truncate the document segments returned by the retriever to fix the same number of documents into the available context. As expected, document truncation reduces accuracy as documents shrink as the chance of the relevant snippet (in the gold document) being omitted grows, as shown in Figure 5. MemGPT has significantly degraded performance using GPT-3.5, due to its limited function calling capabilities, and performs best using GPT-4."
+  }, {
+    "type" : "heading",
+    "id" : 655,
+    "level" : "Subtitle",
+    "page number" : 7,
+    "bounding box" : [ 307.689, 189.167, 500.185, 197.719 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "3.2.2. N ESTED KEY VALUE RETRIEVAL (KV)."
+  }, {
+    "type" : "paragraph",
+    "id" : 656,
+    "page number" : 7,
+    "bounding box" : [ 307.44, 74.873, 541.442, 179.067 ],
+    "font" : null,
+    "font size" : 12.0,
+    "content" : "We introduce a new task based on the synthetic Key-Value retrieval proposed in prior work (Liu et al., 2023a). The goal of this task is to demonstrate how MemGPT can collate information from multiple data sources. In the original KV task, the authors generated a synthetic dataset of keyvalue pairs, where each key and value is a 128-bit UUID (universally unique identifier). The agent is then given a key, and asked to return the associated value for the key. We create a version of the KV task, nested KV retrieval , where values themselves may be keys, thus requiring the agent to perform a multi-hop lookup. In our setup, we fix the total number of UUIDs pairs to 140, corresponding to roughly 8k tokens (the context length of our GPT-4 baseline). We vary the total number of nesting levels from 0 (the initial key-value pair's value is not a key) to 4 (ie 4 total KV lookups are required to find the final value), and sample 30 different ordering configurations including both the initial key position and nesting key positions."
+  }, {
+    "type" : "paragraph",
+    "id" : 658,
+    "page number" : 8,
+    "bounding box" : [ 55.44, 396.099, 289.442, 607.888 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "While GPT-3.5 and GPT-4 have good performance on the original KV tasks, both struggle in the nested KV task. GPT-3.5 is unable to complete the nested variant of the task and has an immediate dropoff in performance, hitting 0 percent accuracy at 1 nesting level (we observe that its primary failure mode is to simply returns the original value). GPT4 and GPT-4 Turbo are better than GPT-3.5, but also suffer from a similar dropoff, and hit 0 percent accuracy by 3 nesting levels. MemGPT with GPT-4 on the other hand is unaffected with the number of nesting levels and is able to perform the nested lookup by accessing the key-value pairs stored in main context repeatedly via function queries. MemGPT with GPT-4 Turbo and GPT-3.5 also have better performance than the corresponding baseline models, but still begin to drop off in performance at 2 nesting levels as a result of failing to perform enough lookups. MemGPT performance on the nested KV task demonstrates its ability to combine multiple queries to perform multi-hop lookups."
+  }, {
+    "type" : "heading",
+    "id" : 661,
+    "level" : "Subtitle",
+    "page number" : 8,
+    "bounding box" : [ 55.44, 367.101, 138.553, 377.849 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "4. Related Work"
+  }, {
+    "type" : "paragraph",
+    "id" : 662,
+    "page number" : 8,
+    "bounding box" : [ 55.44, 204.698, 289.445, 357.101 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Long-context LLMs. Several lines of work have improved the context length of LLMs. For instance, more efficient transformer architectures via sparsifying the attention (Child et al., 2019; Beltagy et al., 2020), low-rank approximations (Wang et al., 2020), and neural memory (Lee et al., 2019). Another line of work aims to extend context windows beyond the length they were original trained for, their training size, such as Press et al. (2021); Chen et al. (2023). MemGPT builds upon these improvements in context length as they improve the size of the main memory in MemGPT. Our main contribution is a hierarchical tiered memory that uses a long-context LLM as the implementation of main memory."
+  }, {
+    "type" : "paragraph",
+    "id" : 663,
+    "page number" : 8,
+    "bounding box" : [ 55.44, 79.169, 289.442, 195.706 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Retrieval-Augmented Models. The design of the external memory of MemGPT builds upon much prior work augmenting LLMs with relevant inputs from external retrievers (Ram et al., 2023; Borgeaud et al., 2022; Karpukhin et al., 2020; Lewis et al., 2020; Guu et al., 2020; Lin et al., 2023). In particular, Jiang et al. (2023) propose FLARE, a method that allows the LLM to actively decide when and what to retrieve during the course of generation. Trivedi et al. (2022) interleave retrieval with Chain-of-Thoughts reasoning to improve multi-step question answering."
+  }, {
+    "type" : "paragraph",
+    "id" : 657,
+    "page number" : 8,
+    "bounding box" : [ 307.44, 461.852, 541.444, 721.85 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "LLMs as agents. Recent work has explored augmenting LLMs with additional capabilities to act as agents in interactive environments. Park et al. (2023) propose adding memory to LLMs and using the LLM as a planner, and observe emergent social behaviors in a multiagent sandbox environment (inspired by The Sims video game) where agents can perform basic activities such as doing chores/hobbies, going to work, and conversing with other agents. Nakano et al. (2021) train models to search the web before answering questions, and use similar pagination concepts to MemGPT to control the underlying context size in their web-browsing environment. Yao et al. (2022) showed that interleaving chain-of-thought reasoning (Wei et al., 2022) can further improve the planning ability of interactive LLM-based agents; similarly in MemGPT, LLM is able to ‘plan out loud’ when executing functions. Liu et al. (2023b) introduced a suite of LLM-asan-agent benchmarks to evaluate LLMs in interactive environments, including video games, thinking puzzles, and web shopping. In contrast, our work focuses on tackling the problem of equipping agents with long-term memory of user inputs."
+  }, {
+    "type" : "heading",
+    "id" : 659,
+    "level" : "Subtitle",
+    "page number" : 8,
+    "bounding box" : [ 307.44, 432.854, 376.529, 443.602 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "5. Conclusion"
+  }, {
+    "type" : "paragraph",
+    "id" : 660,
+    "page number" : 8,
+    "bounding box" : [ 307.44, 115.034, 541.442, 422.466 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In this paper, we introduced MemGPT, a novel LLM system inspired by operating systems to manage the limited context windows of large language models. By designing a memory hierarchy and control flow analogous to traditional OSes, MemGPT provides the illusion of larger context resources for LLMs. This OS-inspired approach was evaluated in two domains where existing LLM performance is constrained by finite context lengths: document analysis and conversational agents. For document analysis, MemGPT could process lengthy texts well beyond the context limits of current LLMs by effectively paging relevant context in and out of memory. For conversational agents, MemGPT enabled maintaining long-term memory, consistency, and evolvability over extended dialogues. Overall, MemGPT demonstrates that operating system techniques like hierarchical memory management and interrupts can unlock the potential of LLMs even when constrained by fixed context lengths. This work opens numerous avenues for future exploration, including applying MemGPT to other domains with massive or unbounded contexts, integrating different memory tier technologies like databases or caches, and further improving control flow and memory management policies. By bridging concepts from OS architecture into AI systems, MemGPT represents a promising new direction for maximizing the capabilities of LLMs within their fundamental limits."
+  }, {
+    "type" : "heading",
+    "id" : 664,
+    "level" : "Subtitle",
+    "page number" : 9,
+    "bounding box" : [ 55.44, 712.478, 110.984, 723.226 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "References"
+  }, {
+    "type" : "paragraph",
+    "id" : 666,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 671.068, 289.445, 703.53 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Iz Beltagy, Matthew E Peters, and Arman Cohan. Longformer: The long-document transformer. arXiv preprint arXiv:2004.05150 , 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 668,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 579.169, 289.442, 659.452 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Sebastian Borgeaud, Arthur Mensch, Jordan Hoffmann, Trevor Cai, Eliza Rutherford, Katie Millican, George Bm Van Den Driessche, Jean-Baptiste Lespiau, Bogdan Damoc, Aidan Clark, et al. Improving language models by retrieving from trillions of tokens. In International conference on machine learning , pp. 2206–2240. PMLR, 2022."
+  }, {
+    "type" : "paragraph",
+    "id" : 670,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 499.226, 289.443, 567.554 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. Language models are few-shot learners. Advances in neural information processing systems , 33: 1877–1901, 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 672,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 443.193, 289.445, 487.611 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Shouyuan Chen, Sherman Wong, Liangjian Chen, and Yuandong Tian. Extending context window of large language models via positional interpolation. arXiv preprint arXiv:2306.15595 , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 674,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 399.115, 289.442, 431.578 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Rewon Child, Scott Gray, Alec Radford, and Ilya Sutskever. Generating long sequences with sparse transformers. arXiv preprint arXiv:1904.10509 , 2019."
+  }, {
+    "type" : "paragraph",
+    "id" : 676,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 343.082, 289.442, 387.5 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Zihang Dai, Zhilin Yang, Yiming Yang, Jaime Carbonell, Quoc V Le, and Ruslan Salakhutdinov. Transformer-xl: Attentive language models beyond a fixed-length context. arXiv preprint arXiv:1901.02860 , 2019."
+  }, {
+    "type" : "paragraph",
+    "id" : 678,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 287.05, 289.442, 331.467 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 , 2018."
+  }, {
+    "type" : "paragraph",
+    "id" : 680,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 242.972, 289.442, 275.434 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Zican Dong, Tianyi Tang, Lunyi Li, and Wayne Xin Zhao. A survey on long text modeling with transformers. arXiv preprint arXiv:2302.14502 , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 682,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 186.939, 289.442, 231.356 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Kelvin Guu, Kenton Lee, Zora Tung, Panupong Pasupat, and Mingwei Chang. Retrieval augmented language model pre-training. In International conference on machine learning , pp. 3929–3938. PMLR, 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 684,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 142.861, 289.442, 175.324 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Gautier Izacard and Edouard Grave. Leveraging passage retrieval with generative models for open domain question answering. arXiv preprint arXiv:2007.01282 , 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 685,
+    "page number" : 9,
+    "bounding box" : [ 55.44, 74.873, 289.442, 131.246 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Gautier Izacard, Mathilde Caron, Lucas Hosseini, Sebastian Riedel, Piotr Bojanowski, Armand Joulin, and Edouard Grave. Unsupervised dense information retrieval with contrastive learning. arXiv preprint arXiv:2112.09118 , 2021."
+  }, {
+    "type" : "paragraph",
+    "id" : 665,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 677.045, 541.442, 721.462 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Zhengbao Jiang, Frank F Xu, Luyu Gao, Zhiqing Sun, Qian Liu, Jane Dwivedi-Yu, Yiming Yang, Jamie Callan, and Graham Neubig. Active retrieval augmented generation. arXiv preprint arXiv:2305.06983 , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 667,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 609.655, 541.442, 666.027 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Vladimir Karpukhin, Barlas O˘ guz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. Dense passage retrieval for open-domain question answering. arXiv preprint arXiv:2004.04906 , 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 669,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 566.175, 541.442, 598.637 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Nikita Kitaev, Łukasz Kaiser, and Anselm Levskaya. Reformer: The efficient transformer. arXiv preprint arXiv:2001.04451 , 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 671,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 498.784, 541.442, 555.157 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Juho Lee, Yoonho Lee, Jungtaek Kim, Adam Kosiorek, Seungjin Choi, and Yee Whye Teh. Set transformer: A framework for attention-based permutation-invariant neural networks. In International conference on machine learning , pp. 3744–3753. PMLR, 2019."
+  }, {
+    "type" : "paragraph",
+    "id" : 673,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 419.439, 541.442, 487.767 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich K¨ uttler, Mike Lewis, Wen-tau Yih, Tim Rockt¨ aschel, et al. Retrieval-augmented generation for knowledgeintensive nlp tasks. Advances in Neural Information Processing Systems , 33:9459–9474, 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 675,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 375.959, 541.442, 408.421 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Chin-Yew Lin. Rouge: A package for automatic evaluation of summaries. In Text summarization branches out , pp. 74–81, 2004."
+  }, {
+    "type" : "paragraph",
+    "id" : 677,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 308.569, 541.442, 364.941 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Xi Victoria Lin, Xilun Chen, Mingda Chen, Weijia Shi, Maria Lomeli, Rich James, Pedro Rodriguez, Jacob Kahn, Gergely Szilvasy, Mike Lewis, Luke Zettlemoyer, and Scott Yih. Ra-dit: Retrieval-augmented dual instruction tuning, 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 679,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 253.133, 541.442, 297.551 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Nelson F Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, and Percy Liang. Lost in the middle: How language models use long contexts. arXiv preprint arXiv:2307.03172 , 2023a."
+  }, {
+    "type" : "paragraph",
+    "id" : 681,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 197.698, 541.442, 242.116 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu Gu, Hangliang Ding, Kaiwen Men, Kejuan Yang, et al. AgentBench: Evaluating llms as agents. arXiv preprint arXiv:2308.03688 , 2023b."
+  }, {
+    "type" : "paragraph",
+    "id" : 683,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 130.308, 541.442, 186.681 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Reiichiro Nakano, Jacob Hilton, Suchir Balaji, Jeff Wu, Long Ouyang, Christina Kim, Christopher Hesse, Shantanu Jain, Vineet Kosaraju, William Saunders, et al. WebGPT: Browser-assisted question-answering with human feedback. arXiv preprint arXiv:2112.09332 , 2021."
+  }, {
+    "type" : "paragraph",
+    "id" : 686,
+    "page number" : 9,
+    "bounding box" : [ 307.44, 74.873, 541.442, 119.29 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. Training language models to follow instructions with human"
+  }, {
+    "type" : "paragraph",
+    "id" : 687,
+    "page number" : 10,
+    "bounding box" : [ 65.403, 700.955, 289.437, 721.642 ],
+    "font" : "NimbusRomNo9L-ReguItal",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "feedback. Advances in Neural Information Processing Systems , 35:27730–27744, 2022."
+  }, {
+    "type" : "paragraph",
+    "id" : 689,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 646.213, 289.442, 690.63 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Joon Sung Park, Joseph C O’Brien, Carrie J Cai, Meredith Ringel Morris, Percy Liang, and Michael S Bernstein. Generative agents: Interactive simulacra of human behavior. arXiv preprint arXiv:2304.03442 , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 691,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 591.47, 289.442, 635.887 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "David A Patterson, Garth Gibson, and Randy H Katz. A case for redundant arrays of inexpensive disks (raid). In Proceedings of the 1988 ACM SIGMOD international conference on Management of data , pp. 109–116, 1988."
+  }, {
+    "type" : "paragraph",
+    "id" : 692,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 548.682, 289.442, 581.144 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Ofir Press, Noah A Smith, and Mike Lewis. Train short, test long: Attention with linear biases enables input length extrapolation. arXiv preprint arXiv:2108.12409 , 2021."
+  }, {
+    "type" : "paragraph",
+    "id" : 693,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 493.939, 289.442, 538.357 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Ori Ram, Yoav Levine, Itay Dalmedigos, Dor Muhlgay, Amnon Shashua, Kevin Leyton-Brown, and Yoav Shoham. In-context retrieval-augmented language models. arXiv preprint arXiv:2302.00083 , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 694,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 427.241, 289.443, 483.614 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Timo Schick, Jane Dwivedi-Yu, Roberto Dess` ı, Roberta Raileanu, Maria Lomeli, Luke Zettlemoyer, Nicola Cancedda, and Thomas Scialom. Toolformer: Language models can teach themselves to use tools. arXiv preprint arXiv:2302.04761 , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 695,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 360.543, 289.442, 416.916 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 , 2023."
+  }, {
+    "type" : "paragraph",
+    "id" : 696,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 281.89, 289.442, 350.217 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "H. Trivedi, Niranjan Balasubramanian, Tushar Khot, and Ashish Sabharwal. Interleaving retrieval with chain-of-thought reasoning for knowledge-intensive multi-step questions. ArXiv , abs/2212.10509, 2022. URL https://api.semanticscholar.org/ CorpusID:254877499 ."
+  }, {
+    "type" : "paragraph",
+    "id" : 697,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 227.147, 289.442, 271.564 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. Advances in neural information processing systems , 30, 2017."
+  }, {
+    "type" : "paragraph",
+    "id" : 698,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 184.359, 289.442, 216.821 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Sinong Wang, Belinda Z Li, Madian Khabsa, Han Fang, and Hao Ma. Linformer: Self-attention with linear complexity. arXiv preprint arXiv:2006.04768 , 2020."
+  }, {
+    "type" : "paragraph",
+    "id" : 699,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 117.661, 289.444, 174.034 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al. Chain-of-thought prompting elicits reasoning in large language models. Advances in Neural Information Processing Systems , 35:24824–24837, 2022."
+  }, {
+    "type" : "paragraph",
+    "id" : 700,
+    "page number" : 10,
+    "bounding box" : [ 55.44, 74.873, 289.442, 107.335 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Jing Xu, Arthur Szlam, and Jason Weston. Beyond goldfish memory: Long-term open-domain conversation. arXiv preprint arXiv:2107.07567 , 2021."
+  }, {
+    "type" : "paragraph",
+    "id" : 688,
+    "page number" : 10,
+    "bounding box" : [ 307.44, 677.045, 541.442, 721.462 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao. React: Synergizing reasoning and acting in language models. arXiv preprint arXiv:2210.03629 , 2022."
+  }, {
+    "type" : "paragraph",
+    "id" : 690,
+    "page number" : 10,
+    "bounding box" : [ 307.44, 609.299, 541.445, 665.672 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al. Judging llm-as-ajudge with mt-bench and chatbot arena. arXiv preprint arXiv:2306.05685 , 2023."
+  }, {
+    "type" : "heading",
+    "id" : 701,
+    "level" : "Subtitle",
+    "page number" : 11,
+    "bounding box" : [ 55.44, 712.478, 116.926, 723.226 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 11.955,
+    "text color" : "[0.0]",
+    "content" : "6. Appendix"
+  }, {
+    "type" : "heading",
+    "id" : 703,
+    "level" : "Subtitle",
+    "page number" : 11,
+    "bounding box" : [ 55.44, 693.522, 180.63, 702.478 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Medi",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "6.1. Prompts and instructions"
+  }, {
+    "type" : "paragraph",
+    "id" : 704,
+    "page number" : 11,
+    "bounding box" : [ 55.44, 650.975, 289.442, 683.437 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The MemGPT prompts have been edited for brevity. For full implementation details (including exact prompts) visit https://research.memgpt.ai."
+  }, {
+    "type" : "heading",
+    "id" : 705,
+    "level" : "Subtitle",
+    "page number" : 11,
+    "bounding box" : [ 55.689, 627.282, 225.64, 635.834 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "6.1.1. M EM GPT INSTRUCTIONS (DMR)"
+  }, {
+    "type" : "paragraph",
+    "id" : 706,
+    "page number" : 11,
+    "bounding box" : [ 55.44, 596.675, 289.442, 617.182 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Example instructions used in the MemGPT persona for chat/dialogue-related tasks."
+  }, {
+    "type" : "paragraph",
+    "id" : 707,
+    "page number" : 11,
+    "bounding box" : [ 65.801, 500.597, 264.855, 586.467 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "The following is information about myself. My task is to completely immerse myself in this role (I should never say that I am an AI, and should reply as if I am playing this role). If the user asks me a question, I should reply with a best guess using the information in core memory and conversation search."
+  }, {
+    "type" : "paragraph",
+    "id" : 708,
+    "page number" : 11,
+    "bounding box" : [ 55.44, 464.705, 289.442, 485.213 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The baselines received the following instructions via a system prompt (preprompt):"
+  }, {
+    "type" : "paragraph",
+    "id" : 709,
+    "page number" : 11,
+    "bounding box" : [ 65.801, 318.815, 270.235, 454.498 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Your task is to answer a question from the user about your prior conversations. The following is a summary of all your prior conversations: CONVERSATION SUMMARY Answer from the perspective of the persona provided (do not say that you are an AI assistant). If you do not have enough information to answer the question, reply ’NO ANSWER’. Either reply with the answer, or reply ’NO ANSWER’, do not say anything else."
+  }, {
+    "type" : "heading",
+    "id" : 711,
+    "level" : "Subtitle",
+    "page number" : 11,
+    "bounding box" : [ 55.689, 292.823, 213.078, 301.375 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "6.1.2. LLM J UDGE (DMR / OPENER )"
+  }, {
+    "type" : "paragraph",
+    "id" : 713,
+    "page number" : 11,
+    "bounding box" : [ 55.44, 226.35, 289.442, 282.723 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In order to both check the correctness of the answer for the DMR task, we used an LLM judge. The LLM judge was provided the answers generated by both baseline approaches and MemGPT, and asked to make a judgement with the following prompt:"
+  }, {
+    "type" : "paragraph",
+    "id" : 715,
+    "page number" : 11,
+    "bounding box" : [ 65.801, 90.423, 270.235, 216.143 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Your task is to label an answer to a question as ’CORRECT’ or ’WRONG’. You will be given the following data: (1) a question (posed by one user to another user), (2) a ’gold’ (ground truth) answer, (3) a generated answer which you will score as CORRECT/WRONG. The point of the question is to ask about something one user should know about the other user based on their prior conversations. The gold answer will usually be a concise and short answer that includes"
+  }, {
+    "type" : "paragraph",
+    "id" : 702,
+    "page number" : 11,
+    "bounding box" : [ 317.801, 325.259, 527.615, 719.971 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "the referenced topic, for example: Question: Do you remember what I got the last time I went to Hawaii? Gold answer: A shell necklace The generated answer might be much longer, but you should be generous with your grading as long as it touches on the same topic as the gold answer, it should be counted as CORRECT. For example, the following answers would be considered CORRECT: Generated answer (CORRECT): Oh yeah, that was so fun! I got so much stuff there, including that shell necklace. Generated answer (CORRECT): I got a ton of stuff... that surfboard, the mug, the necklace, those coasters too.. Generated answer (CORRECT): That cute necklace The following answers would be considered WRONG: Generated answer (WRONG): Oh yeah, that was so fun! I got so much stuff there, including that mug. Generated answer (WRONG): I got a ton of stuff... that surfboard, the mug, those coasters too.. Generated answer (WRONG): I’m sorry, I don’t remember what you’re talking about. Now it’s time for the real question: Question: QUESTION Gold answer: GOLD ANSWER Generated answer: GENERATED ANSWER First, provide a short (one sentence) explanation of your reasoning, then finish with CORRECT or WRONG. Do NOT include both CORRECT and WRONG in your response, or it will break the evaluation script."
+  }, {
+    "type" : "heading",
+    "id" : 710,
+    "level" : "Subtitle",
+    "page number" : 11,
+    "bounding box" : [ 307.689, 299.277, 528.008, 307.829 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "6.1.3. S ELF INSTRUCT DMR DATASET GENERATION"
+  }, {
+    "type" : "paragraph",
+    "id" : 712,
+    "page number" : 11,
+    "bounding box" : [ 307.44, 244.759, 541.442, 289.177 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The DMR question/answer pairs were generated using the following prompt and the original MSC dataset: Your task is to write a ”memory challenge” question for a simulated dialogue between two users."
+  }, {
+    "type" : "paragraph",
+    "id" : 714,
+    "page number" : 11,
+    "bounding box" : [ 317.801, 88.906, 527.615, 234.552 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "You get as input: personas for each user (gives you their basic facts) a record of an old chat the two users had with each other Your task is to write a question from user A to user B that test’s user B’s memory. The question should be crafted in a way that user B must have actually participated in the prior conversation to answer properly, not just have read the persona summary. Do NOT under any circumstances create a"
+  }, {
+    "type" : "paragraph",
+    "id" : 716,
+    "page number" : 12,
+    "bounding box" : [ 65.801, 145.931, 275.615, 719.971 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "question that can be answered using the persona information (that’s considered cheating). Instead, write a question that can only be answered by looking at the old chat log (and is not contained in the persona information). For example, given the following chat log and persona summaries: old chat between user A and user B A: Are you into surfing? I’m super into surfing myself B: Actually I’m looking to learn. Maybe you could give me a basic lesson some time! A: Yeah for sure! We could go to Pacifica, the waves there are pretty light and easy B: That sounds awesome A: There’s even a cool Taco Bell right by the beach, could grab a bite after B: What about this Sunday around noon? A: Yeah let’s do it! user A persona: I like surfing I grew up in Santa Cruz user B persona: I work in tech I live in downtown San Francisco Here’s an example of a good question that sounds natural, and an answer that cannot be directly inferred from user A’s persona: User B’s question for user A B: Remember that one time we went surfing? What was that one place we went to for lunch called? A: Taco Bell! This is an example of a bad question, where the question comes across as unnatural, and the answer can be inferred directly from user A’s persona: User B’s question for user A B: Do you like surfing? A: Yes, I like surfing Never, ever, ever create questions that can be answered from the persona information."
+  }, {
+    "type" : "heading",
+    "id" : 725,
+    "level" : "Subtitle",
+    "page number" : 12,
+    "bounding box" : [ 55.689, 121.245, 246.132, 129.797 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "6.1.4. D OCUMENT A NALYSIS I NSTRUCTIONS"
+  }, {
+    "type" : "paragraph",
+    "id" : 726,
+    "page number" : 12,
+    "bounding box" : [ 55.44, 90.638, 289.442, 111.145 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Example instructions used in the preprompt for document analysis tasks."
+  }, {
+    "type" : "paragraph",
+    "id" : 717,
+    "page number" : 12,
+    "bounding box" : [ 317.801, 633.207, 527.615, 719.077 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "You are MemGPT DOC-QA bot. Your job is to answer questions about documents that are stored in your archival memory. The answer to the users question will ALWAYS be in your archival memory, so remember to keep searching if you can’t find the answer. Answer the questions as if though the year is 2018."
+  }, {
+    "type" : "heading",
+    "id" : 718,
+    "level" : "Subtitle",
+    "page number" : 12,
+    "bounding box" : [ 307.44, 596.505, 541.442, 617.012 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Questions were provided to MemGPT with the following prompt:"
+  }, {
+    "type" : "paragraph",
+    "id" : 719,
+    "page number" : 12,
+    "bounding box" : [ 317.801, 510.876, 522.235, 586.783 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Search your archival memory to answer the provided question. Provide both the answer and the archival memory result from which you determined your answer. Format your response with the format ’ANSWER: [YOUR ANSWER], DOCUMENT: [ARCHIVAL MEMORY TEXT]. Your task is to answer the question:"
+  }, {
+    "type" : "heading",
+    "id" : 720,
+    "level" : "Subtitle",
+    "page number" : 12,
+    "bounding box" : [ 307.44, 474.174, 541.442, 494.681 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "For baselines, the following prompt along with a retrieved list of documents was provided:"
+  }, {
+    "type" : "paragraph",
+    "id" : 721,
+    "page number" : 12,
+    "bounding box" : [ 317.801, 278.956, 527.615, 464.452 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Answer the question provided according to the list of documents below (some of which might be irrelevant. In your response, provide both the answer and the document text from which you determined the answer. Format your response with the format ’ANSWER: <YOUR ANSWER>, DOCUMENT: [DOCUMENT TEXT]’. If none of the documents provided have the answer to the question, reply with ’INSUFFICIENT INFORMATION’. Do NOT provide an answer if you cannot find it in the provided documents. Your response will only be considered correct if you provide both the answer and relevant document text, or say ’INSUFFICIENT INFORMATION’. Answer the question as if though the current year is 2018."
+  }, {
+    "type" : "heading",
+    "id" : 722,
+    "level" : "Subtitle",
+    "page number" : 12,
+    "bounding box" : [ 307.689, 253.184, 492.544, 261.736 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "6.1.5. LLM J UDGE ( DOCUMENT ANALYSIS )"
+  }, {
+    "type" : "paragraph",
+    "id" : 723,
+    "page number" : 12,
+    "bounding box" : [ 307.44, 162.801, 541.442, 243.084 ],
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "In order to both check the correctness of the answer for the document analysis task, and also to ensure that the answer was properly derived from the provided text (rather than from the model weights), we used an LLM judge. The LLM judge was provided the answers generated by both baseline approaches and MemGPT, and asked to make a judgement with the following prompt:"
+  }, {
+    "type" : "paragraph",
+    "id" : 724,
+    "page number" : 12,
+    "bounding box" : [ 317.801, 87.135, 527.615, 153.079 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Your task is to evaluate whether an LLM correct answered a question. The LLM response should be the format \"ANSWER: [answer], DOCUMENT: [document text]\" or say \"INSUFFICIENT INFORMATION\". The true answer is provided in the format \"TRUE ANSWER:[list of possible"
+  }, {
+    "type" : "paragraph",
+    "id" : 727,
+    "page number" : 13,
+    "bounding box" : [ 65.801, 554.399, 275.615, 719.971 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "answers]\". The questions is provided in the format \"QUESTION: [question]\". If the LLM response contains both the correct answer and corresponding document text, the response is correct. Even if the LLM’s answer and the true answer are slightly different in wording, the response is still correct. For example, if the answer is more specific than the true answer or uses a different phrasing that is still correct, the response is correct. If the LLM response if \"INSUFFICIENT INFORMATION\", or the \"DOCUMENT\" field is missing, the response is incorrect. Respond with a single token: \"CORRECT\" or \"INCORRECT\"."
+  }, {
+    "type" : "heading",
+    "id" : 728,
+    "level" : "Subtitle",
+    "page number" : 13,
+    "bounding box" : [ 55.689, 529.655, 193.709, 538.207 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 7.97,
+    "text color" : "[0.0]",
+    "content" : "6.1.6. K/V T ASK I NSTRUCTIONS"
+  }, {
+    "type" : "heading",
+    "id" : 729,
+    "level" : "Subtitle",
+    "page number" : 13,
+    "bounding box" : [ 55.44, 487.093, 289.442, 519.555 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "The MemGPT agent was defined with the following persona, designed to encourage MemGPT to iteratively search:"
+  }, {
+    "type" : "paragraph",
+    "id" : 730,
+    "page number" : 13,
+    "bounding box" : [ 65.801, 373.402, 275.615, 479.197 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "You are MemGPT DOC-QA bot. Your job is to answer questions about documents that are stored in your archival memory. The answer to the users question will ALWAYS be in your archival memory, so remember to keep searching if you can’t find the answer. DO NOT STOP SEARCHING UNTIL YOU VERIFY THAT THE VALUE IS NOT A KEY. Do not stop making nested lookups until this condition is met."
+  }, {
+    "type" : "heading",
+    "id" : 731,
+    "level" : "Subtitle",
+    "page number" : 13,
+    "bounding box" : [ 55.44, 349.465, 267.155, 358.017 ],
+    "heading level" : 1,
+    "font" : "NimbusRomNo9L-Regu",
+    "font size" : 9.963,
+    "text color" : "[0.0]",
+    "content" : "Baselines were instructed with the following prompt:"
+  }, {
+    "type" : "paragraph",
+    "id" : 732,
+    "page number" : 13,
+    "bounding box" : [ 65.801, 243.425, 275.615, 339.258 ],
+    "font" : "NimbusMonL-Regu",
+    "font size" : 8.966,
+    "text color" : "[0.0]",
+    "content" : "Below is a JSON object containing key-value pairings, all keys and values are 128-bit UUIDs, and your task is to return the value associated with the specified key. If a value itself is also a key, return the value of that key (do a nested lookup). For example, if the value of ’x’ is ’y’, but ’y’ is also a key, return the value of key ’y’."
+  } ]
+}
