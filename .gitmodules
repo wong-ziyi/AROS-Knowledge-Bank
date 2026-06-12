@@ -1,0 +1,36 @@
+[submodule "Projects/memU"]
+	path = Projects/memU
+	url = https://github.com/NevaMind-AI/memU.git
+[submodule "Projects/hindsight"]
+	path = Projects/hindsight
+	url = https://github.com/vectorize-io/hindsight.git
+[submodule "Projects/mem0"]
+	path = Projects/mem0
+	url = https://github.com/mem0ai/mem0.git
+[submodule "Projects/text2meme"]
+	path = Projects/text2meme
+	url = https://github.com/abhishtagatya/text2meme.git
+[submodule "Projects/letta"]
+	path = Projects/letta
+	url = https://github.com/letta-ai/letta.git
+[submodule "Projects/ReMe"]
+	path = Projects/ReMe
+	url = https://github.com/agentscope-ai/ReMe.git
+[submodule "Projects/memos"]
+	path = Projects/memos
+	url = https://github.com/usememos/memos.git
+[submodule "Projects/OpenViking"]
+	path = Projects/OpenViking
+	url = https://github.com/volcengine/OpenViking.git
+[submodule "Projects/Second-Me"]
+	path = Projects/Second-Me
+	url = https://github.com/mindverse/Second-Me.git
+[submodule "Projects/meta-meme"]
+	path = Projects/meta-meme
+	url = https://github.com/meta-introspector/meta-meme.git
+[submodule "Projects/SkillX"]
+	path = Projects/SkillX
+	url = https://github.com/zjunlp/SkillX.git
+[submodule "Projects/SkillOpt"]
+	path = Projects/SkillOpt
+	url = https://github.com/microsoft/SkillOpt.git
