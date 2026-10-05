@@ -1,5 +1,7 @@
 # AROS Knowledge Bank
 
+> **Ecosystem direction · 5 October 2026:** [Current strategy and role](docs/AROS_STRATEGY.md). AROS is commercially prelaunch; this repository’s source and release records establish only their stated technical scope. The first business gate is repeated external value and sustainable paid delivery.
+
 > **Foundational Literature & Project Codebases for the [Antigravity Research OS (AROS)](https://github.com/LabOnoM/AROS)**
 
 This repository is the permanent knowledge bank that houses the academic papers and open-source project codebases that directly inspired the AROS architecture. It serves as the **primary reference source** for AI coding agents when debugging, troubleshooting, or implementing features related to agentic memory, skill evolution, and LLM-OS design patterns.
