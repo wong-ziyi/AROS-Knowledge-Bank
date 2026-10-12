@@ -1,5 +1,5 @@
 ---
-version: alpha
+version: 2026.10.0
 name: AROS Deep Space
 description: >
   Unified visual identity for the AROS product family (AROS core dashboards,
@@ -8,6 +8,9 @@ description: >
   agent-activity accent. Derived from the audited tokens of
   AROS-Cloud-Federation/DESIGN_SPEC.md — the family's most mature system —
   and reconciled against every other shipped AROS surface.
+  The family file of the LabOnoM Design Guide (github.com/LabOnoM/design); the
+  Lab Canvas profile in profiles/lab-canvas/ derives from it for the desktop
+  canvas tools.
 colors:
   # ---- Neutrals (dark theme = default brand mode) ----
   background: "#09090B"          # hsl(240 10% 3.9%)
@@ -236,6 +239,12 @@ The complete interaction-level specification (commerce states, access badges,
 component APIs, ARIA patterns) lives in
 `AROS-Cloud-Federation/DESIGN_SPEC.md`; this file is the family-wide token
 layer that spec now inherits from.
+
+### Nexitia Public Identity
+
+The public website uses the Nexitia company identity above the AROS product system: a white geometric N on indigo and a theme-aware `nexitia.ai` wordmark. Navbar and footer share `BrandLogo`; the mark remains 32-36px and its enclosing link is named "Nexitia home". This does not rename the AROS products or their operational interfaces.
+
+The homepage campaign header uses paired local glass-N raster assets: silver on charcoal with white HTML type in dark mode, and deep indigo on pearl-white with charcoal type in light mode. The small N has matching white-on-indigo and indigo-on-pearl colorways, not separate identities. Scoped header color variables adapt buttons, supporting text, focus outlines and the foundation strip. The existing root `.dark` class selects the artwork with no layout-size change; operating-system preference does not override the saved site choice. The thesis is "Train the procedure, not the weights." No glow blobs, version-live badges, benchmark promises or inventory counts belong in this header. Text has zero letter spacing and fixed breakpoint sizes. See [Nexitia brand guide](brand/nexitia-brand.md).
 
 ## Colors
 
