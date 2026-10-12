@@ -65,6 +65,13 @@ git clone --recurse-submodules https://github.com/wong-ziyi/AROS-Knowledge-Bank.
 
 ---
 
+## 🎨 Design
+
+The SkillOpt pages and the documentation site follow the **LabOnoM Design Guide** (`LabOnoM/design`, version in
+`DESIGN_VERSION`): one token source, both themes, reserved status hues, and words from its glossary. `DESIGN.md` at this
+repository's root is the pinned family file "AROS Deep Space"; `scripts/design-pin-check.sh` verifies it. The vendored
+third-party submodules under `Projects/` keep their own conventions.
+
 ## 🤖 For AI Agents
 
 See [`AGENT_DISCOVERY.md`](AGENT_DISCOVERY.md) for the machine-readable discovery manifest.
